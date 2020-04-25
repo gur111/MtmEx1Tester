@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -35,16 +36,18 @@ Election getSampleData() {
     return election;
 }
 
-void cleanUp(election) { electionDestroy(election); }
+void cleanUp(Election election) { electionDestroy(election); }
 
 /**
  * The subtests are defined here.
  * Each one targets a specific edge case
  */
 
-bool subAddTribeInvalidId(sample) {
-    ASSERT_TEST(electionAddTribe(sample, -1, "InvalidTribe") ==
-                ELECTION_INVALID_ID);
+bool subAddTribeInvalidId(Election sample) {
+    bool status = true;
+    status = status & (electionAddTribe(sample, -1, "InvalidTribe") ==
+                       ELECTION_INVALID_ID);
+    return status;
 }
 
 // END SUBTESTS
@@ -71,11 +74,9 @@ void testRemoveArea() {}
 void testRemoveAreas() {}
 void testAddVote() {}
 void testRemoveVote() {}
-void electionSetTribeName() {}
-void electionComputeAreasToTribesMapping() {}
+void testComputeAreasToTribesMapping() {}
 void testSetTribeName() {}
 void testGetTribeName() {}
-void testComputeAreasToTribesMapping() {}
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
