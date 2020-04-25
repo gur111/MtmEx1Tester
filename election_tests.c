@@ -55,8 +55,8 @@ bool subAddTribeInvalidId(sample) {
  * possible.
  */
 
-bool testCreate() {}
-bool testAddTribe() {
+void testCreate() {}
+void testAddTribe() {
     printf("Testing %s tests...\n", "'Add Tribe'");
     TEST_WITH_SAMPLE(subAddTribeInvalidId, "Invalid Tribe ID");
     // TODO:
@@ -65,25 +65,25 @@ bool testAddTribe() {
     // TODO:
     // TODO:
 }
-bool testRemoveTribe() {}
-bool testAddArea() {}
-bool testRemoveArea() {}
-bool testRemoveAreas() {}
-bool testAddVote() {}
-bool testRemoveVote() {}
-bool electionSetTribeName() {}
-bool electionComputeAreasToTribesMapping() {}
-bool testSetTribeName() {}
-bool testGetTribeName() {}
-bool testComputeAreasToTribesMapping() {}
-bool testDoomsDay() {
+void testRemoveTribe() {}
+void testAddArea() {}
+void testRemoveArea() {}
+void testRemoveAreas() {}
+void testAddVote() {}
+void testRemoveVote() {}
+void electionSetTribeName() {}
+void electionComputeAreasToTribesMapping() {}
+void testSetTribeName() {}
+void testGetTribeName() {}
+void testComputeAreasToTribesMapping() {}
+void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
 }
-bool testDestroy() {}
+void testDestroy() {}
 
 /*The functions for the tests should be added here*/
-bool (*tests[])(void) = {testCreate,
+void (*tests[])(void) = {testCreate,
                          testAddTribe,
                          testRemoveTribe,
                          testAddArea,
