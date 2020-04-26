@@ -51,17 +51,17 @@ static bool g_status = true;
 Election getSampleData() {
     Election election = electionCreate();
     assert(election != NULL);
-    electionAddTribe(election, 11, "TribeA");
-    electionAddTribe(election, 12, "TribeB");
-    electionAddTribe(election, 13, "TribeC");
-    electionAddTribe(election, 14, "TribeD");
-    electionAddTribe(election, 15, "TribeE");
-    electionAddArea(election, 21, "AreaA");
-    electionAddArea(election, 22, "AreaB");
-    electionAddArea(election, 23, "AreaC");
-    electionAddArea(election, 24, "AreaD");
-    electionAddArea(election, 25, "AreaE");
-    electionAddArea(election, 26, "AreaF");
+    assert(electionAddTribe(election, 11, "tribe a") == ELECTION_SUCCESS);
+    assert(electionAddTribe(election, 12, "tribe b") == ELECTION_SUCCESS);
+    assert(electionAddTribe(election, 13, "tribe c") == ELECTION_SUCCESS);
+    assert(electionAddTribe(election, 14, "tribe d") == ELECTION_SUCCESS);
+    assert(electionAddTribe(election, 15, "tribe e") == ELECTION_SUCCESS);
+    assert(electionAddArea(election, 21, "area a") == ELECTION_SUCCESS);
+    assert(electionAddArea(election, 22, "area b") == ELECTION_SUCCESS);
+    assert(electionAddArea(election, 23, "area c") == ELECTION_SUCCESS);
+    assert(electionAddArea(election, 24, "area d") == ELECTION_SUCCESS);
+    assert(electionAddArea(election, 25, "area e") == ELECTION_SUCCESS);
+    assert(electionAddArea(election, 26, "area f") == ELECTION_SUCCESS);
     return election;
 }
 
@@ -82,7 +82,7 @@ bool subAddTribeInvalidId(Election sample) {
 
 bool subAddTribeExist(Election sample) {
     // Existing ID
-    ASSERT_TEST(electionAddTribe(sample, 11, "AlreadyExist") ==
+    ASSERT_TEST(electionAddTribe(sample, 11, "already exist") ==
                 ELECTION_TRIBE_ALREADY_EXIST);
     // Existing Name
     ASSERT_TEST(electionAddTribe(sample, 1, electionGetTribeName(sample, 11)) ==
@@ -106,6 +106,35 @@ bool subAddTribeLongName(Election sample) {
     return true;
 }
 
+bool subAddTribeInvalidName(Election sample) {
+    ASSERT_TEST(electionAddTribe(sample, 1, "UPPER CASE INVALID") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "names.with.dots.invalid") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "hyphens-are-invalid-too") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "underscores_as_well") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "comma,is not valid") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "exclamation!mark") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "question?mark") ==
+                ELECTION_INVALID_NAME);
+    return true;
+}
+
+bool subAddTribeValidName(Election sample) {
+    ASSERT_TEST(electionAddTribe(sample, 1, "names with spaces") ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddTribe(sample, 2, "nospaces") == ELECTION_SUCCESS);
+    // Check empty string
+    ASSERT_TEST(electionAddTribe(sample, 3, "") == ELECTION_SUCCESS);
+    // String with only space
+    ASSERT_TEST(electionAddTribe(sample, 4, " ") == ELECTION_SUCCESS);
+    return true;
+}
+
 // END SUBTESTS
 
 /**
@@ -120,6 +149,8 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeInvalidId, "Invalid Tribe ID");
     TEST_WITH_SAMPLE(subAddTribeLongName, "Long Tribe Name");
     TEST_WITH_SAMPLE(subAddTribeExist, "Pre Existing Tribe/TribeId");
+    TEST_WITH_SAMPLE(subAddTribeInvalidName, "Invalid Tribe Names");
+    TEST_WITH_SAMPLE(subAddTribeValidName, "Valid Tribe Names");
     // TODO:
     // TODO:
     // TODO:
