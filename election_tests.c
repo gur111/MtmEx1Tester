@@ -13,11 +13,14 @@
             printf("[OK]\n");                \
         } else {                             \
             printf("[Failed]\n");            \
+            g_status = false;                \
         }                                    \
         cleanUp(sample);                     \
     } while (0)
 
 bool isEven(int num) { return num % 2 ? false : true; }
+
+static bool g_status = true;
 
 Election getSampleData() {
     Election election = electionCreate();
@@ -103,5 +106,9 @@ int main(int argc, char* argv[]) {
     for (int test_idx = 0; tests[test_idx] != NULL; test_idx++) {
         tests[test_idx]();
     }
-    return 0;
+    if (g_status) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
