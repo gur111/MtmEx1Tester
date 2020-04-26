@@ -128,10 +128,29 @@ bool subAddTribeValidName(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, 1, "names with spaces") ==
                 ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 2, "nospaces") == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 2), "nospaces") == 0);
     // Check empty string
     ASSERT_TEST(electionAddTribe(sample, 3, "") == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 3), "") == 0);
     // String with only space
     ASSERT_TEST(electionAddTribe(sample, 4, " ") == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 4), " ") == 0);
+    return true;
+}
+
+// TODO: Think of a better name
+/**
+ * This test makes sure the string sent to tribe as name is copied and not
+ * merely the same instance is used
+ */
+bool subAddTribeCopyString(Election sample) {
+    char name[] = "some name";
+    ASSERT_TEST(electionAddTribe(sample, 1, name) == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), name) == 0);
+    name[0] = 'a';
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), name) != 0);
+    ASSERT_TEST(electionGetTribeName(sample, 1) != name);
+
     return true;
 }
 
@@ -151,6 +170,7 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeExist, "Pre Existing Tribe/TribeId");
     TEST_WITH_SAMPLE(subAddTribeInvalidName, "Invalid Tribe Names");
     TEST_WITH_SAMPLE(subAddTribeValidName, "Valid Tribe Names");
+    TEST_WITH_SAMPLE(subAddTribeCopyString, "Dereferencing String Tribe Name");
     // TODO:
     // TODO:
     // TODO:
