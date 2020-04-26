@@ -48,7 +48,7 @@ void cleanUp(Election election) { electionDestroy(election); }
 
 bool subAddTribeInvalidId(Election sample) {
     bool status = true;
-    status = status & (electionAddTribe(sample, -1, "InvalidTribe") !=
+    status = status & (electionAddTribe(sample, -1, "InvalidTribe") ==
                        ELECTION_INVALID_ID);
     return status;
 }
