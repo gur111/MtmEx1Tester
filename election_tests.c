@@ -5,6 +5,32 @@
 #include "../election/election.h"
 #include "../mtm_map/map.h"
 
+#define SUPER_LONG_STRING                                                      \
+    "why how impolite of him i asked him a civil question and he pretended "   \
+    "not to hear me thats not at all nice calling after him i say mr white "   \
+    "rabbit where are you going hmmm he wont answer me and i do so want to "   \
+    "know what he is late for i wonder if i might follow him why not theres "  \
+    "no rule that i maynt go where i please ii will follow him wait for me "   \
+    "mr white rabbit im coming too falling how curious i never realized that " \
+    "rabbit holes were so dark    and so long    and so empty i believe i "    \
+    "have been falling for five minutes and i still cant see the bottom hmph " \
+    "after such a fall as this i shall think nothing of tumbling downstairs "  \
+    "how brave theyll all think me at home why i wouldnt say anything about "  \
+    "it even if i fell off the top of the house i wonder how many miles ive "  \
+    "fallen by this time i must be getting somewhere near the center of the "  \
+    "earth i wonder if i shall fall right through the earth how funny that "   \
+    "would be oh i think i see the bottom yes im sure i see the bottom i "     \
+    "shall hit the bottom hit it very hard and oh how it will hurt"
+
+#define ASSERT_TEST(expr)                                                 \
+    do {                                                                  \
+        if (!(expr)) {                                                    \
+            printf("\nAssertion failed at %s:%d %s ", __FILE__, __LINE__, \
+                   #expr);                                                \
+            return false;                                                 \
+        }                                                                 \
+    } while (0)
+
 #define TEST_WITH_SAMPLE(test, name)         \
     do {                                     \
         Election sample = getSampleData();   \
@@ -47,10 +73,37 @@ void cleanUp(Election election) { electionDestroy(election); }
  */
 
 bool subAddTribeInvalidId(Election sample) {
-    bool status = true;
-    status = status & (electionAddTribe(sample, -1, "InvalidTribe") ==
-                       ELECTION_INVALID_ID);
-    return status;
+    ASSERT_TEST(electionAddTribe(sample, -1, "InvalidTribe") ==
+                ELECTION_INVALID_ID);
+    // Verify it wasn't added
+    ASSERT_TEST(electionGetTribeName(sample, -1) == NULL);
+    return true;
+}
+
+bool subAddTribeExist(Election sample) {
+    // Existing ID
+    ASSERT_TEST(electionAddTribe(sample, 11, "AlreadyExist") ==
+                ELECTION_TRIBE_ALREADY_EXIST);
+    // Existing Name
+    ASSERT_TEST(electionAddTribe(sample, 1, electionGetTribeName(sample, 11)) ==
+                ELECTION_SUCCESS);
+    // Make sure names match
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1),
+                       electionGetTribeName(sample, 11)) == 0);
+    // Make sure the names are different instances
+    ASSERT_TEST(electionGetTribeName(sample, 1) !=
+                electionGetTribeName(sample, 11));
+
+    return true;
+}
+
+bool subAddTribeLongName(Election sample) {
+    ASSERT_TEST(electionAddTribe(sample, 1, SUPER_LONG_STRING) ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(electionGetTribeName(sample, 1) != NULL);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), SUPER_LONG_STRING) ==
+                0);
+    return true;
 }
 
 // END SUBTESTS
@@ -65,6 +118,8 @@ void testCreate() {}
 void testAddTribe() {
     printf("Testing %s tests...\n", "'Add Tribe'");
     TEST_WITH_SAMPLE(subAddTribeInvalidId, "Invalid Tribe ID");
+    TEST_WITH_SAMPLE(subAddTribeLongName, "Long Tribe Name");
+    TEST_WITH_SAMPLE(subAddTribeExist, "Pre Existing Tribe/TribeId");
     // TODO:
     // TODO:
     // TODO:
