@@ -121,6 +121,12 @@ bool subAddTribeInvalidName(Election sample) {
                 ELECTION_INVALID_NAME);
     ASSERT_TEST(electionAddTribe(sample, 1, "question?mark") ==
                 ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "new\nline") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "tab\tname") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "bell\bname") ==
+                ELECTION_INVALID_NAME);
     return true;
 }
 
