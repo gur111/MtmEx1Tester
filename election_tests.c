@@ -177,7 +177,6 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeInvalidName, "Invalid Tribe Names");
     TEST_WITH_SAMPLE(subAddTribeValidName, "Valid Tribe Names");
     TEST_WITH_SAMPLE(subAddTribeCopyString, "Dereferencing String Tribe Name");
-    printf("Some new line\n");
     // TODO:
     // TODO:
     // TODO:
