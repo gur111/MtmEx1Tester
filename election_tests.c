@@ -5,6 +5,16 @@
 
 #include "../election/election.h"
 #include "../mtm_map/map.h"
+#include "utils.h"
+
+#define STRESS_INVERTALS_MODIFIER 10000
+
+#ifdef __unix__
+// #define WITH_FORK
+// Fuck Microsoft and all it stands for.
+// If you need to debug on this shitty OS, get the errors one by one.
+// Also, good luck. You'll need it
+#endif
 
 #define SUPER_LONG_STRING                                                      \
     "why how impolite of him i asked him a civil question and he pretended "   \
@@ -52,7 +62,7 @@ bool isCorrectArea(int area_id) {
     static int correct_area = -1;
     if (area_id < 0) {
         correct_area = area_id * (-1);
-        return true; // Return value doesn't matter here
+        return true;  // Return value doesn't matter here
     } else {
         assert(correct_area >= 0);
         return area_id == correct_area;
@@ -180,6 +190,16 @@ bool subAddTribeExtremeIdValues(Election sample) {
     return true;
 }
 
+// Test removing and readding tribe
+bool subRemoveTribeReadd(Election sample) {
+    ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddTribe(sample, 11, "re added") == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 11), "re added") == 0);
+    ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddTribe(sample, 11, "and again") == ELECTION_SUCCESS);
+    return true;
+}
+
 /**
  * This test makes sure the string sent to tribe as name is copied and not
  * merely the same instance is used
@@ -289,6 +309,52 @@ bool subAddAreaExtremeIdValues(Election sample) {
     return true;
 }
 
+// Test removing and readding area
+bool subRemoveAreaReadd(Election sample) {
+    ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(sample, 21, "re added") == ELECTION_SUCCESS);
+    ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(sample, 21, "and again") == ELECTION_SUCCESS);
+    return true;
+}
+
+bool subStressAddRemoveRepeat(Election sample) {
+    bool status = true;
+    const int iterations = STRESS_INVERTALS_MODIFIER * 10;
+
+    for (int i = 0; i < iterations; i++) {
+        status = status | subRemoveTribeReadd(sample);
+    }
+    // TODO Add some votes. Can rely on computation test
+    for (int i = 0; i < iterations; i++) {
+        status = status | subRemoveAreaReadd(sample);
+        // TODO: Add some votes
+    }
+
+    return status;
+}
+
+bool subStressAddThenRemove(Election sample) {
+    bool status = true;
+    const int iterations = STRESS_INVERTALS_MODIFIER / 20;
+    for (int i = 0; i < iterations; i++) {
+        ASSERT_TEST(electionAddArea(sample, i + 100, randLowerString(7)) ==
+                    ELECTION_SUCCESS);
+        ASSERT_TEST(electionAddTribe(sample, i + 100, randLowerString(7)) ==
+                    ELECTION_SUCCESS);
+    }
+    // TODO Add some votes. Can rely on computation test
+    for (int i = 0; i < iterations; i++) {
+        ASSERT_TEST(electionRemoveAreas(sample, specificArea(i + 100)) ==
+                    ELECTION_SUCCESS);
+        ASSERT_TEST(electionRemoveTribe(sample, i + 100) == ELECTION_SUCCESS);
+        // TODO: Add some votes
+    }
+
+    return status;
+}
 // END SUBTESTS
 
 /**
@@ -332,6 +398,8 @@ void testGetTribeName() {}
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
+    TEST_WITH_SAMPLE(subStressAddRemoveRepeat, "Rapid Add and Remove");
+    TEST_WITH_SAMPLE(subStressAddThenRemove, "Fill Up Then Clear One By One");
 }
 void testDestroy() {}
 
