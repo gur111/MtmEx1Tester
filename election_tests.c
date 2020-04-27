@@ -47,6 +47,24 @@
 
 bool isEven(int num) { return num % 2 ? false : true; }
 
+// Problematic with id 0
+bool isCorrectArea(int area_id) {
+    static int correct_area = -1;
+    if (area_id < 0) {
+        correct_area = area_id * (-1);
+        return true; // Return value doesn't matter here
+    } else {
+        assert(correct_area >= 0);
+        return area_id == correct_area;
+    }
+}
+
+AreaConditionFunction specificArea(int area_id) {
+    assert(area_id >= 0);
+    isCorrectArea((-1) * area_id);
+    return isCorrectArea;
+}
+
 static bool g_status = true;
 
 Election getSampleData() {
