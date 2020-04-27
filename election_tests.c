@@ -2,9 +2,19 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "../election/election.h"
 #include "../mtm_map/map.h"
+
+#ifdef __unix__
+#define WITH_FORK
+// Fuck Microsoft and all it stands for.
+// If you need to debug on this shitty OS, get the errors one by one.
+// Also, good luck. You'll need it
+#endif
 
 #define SUPER_LONG_STRING                                                      \
     "why how impolite of him i asked him a civil question and he pretended "   \
@@ -46,6 +56,23 @@
     } while (0)
 
 bool isEven(int num) { return num % 2 ? false : true; }
+
+bool isCorrectArea(int area_id) {
+    static int correct_area = -1;
+    if (area_id < 0) {
+        correct_area = area_id * (-1);
+        return true;
+    } else {
+        assert(area_id >= 0);
+        return area_id == correct_area;
+    }
+}
+
+AreaConditionFunction specificArea(int area_id) {
+    assert(area_id >= 0);
+    isCorrectArea((-1) * area_id);
+    return isCorrectArea;
+}
 
 static bool g_status = true;
 
@@ -148,6 +175,7 @@ bool subAddTribeValidName(Election sample) {
     return true;
 }
 
+// Checking on edge cases integers. Max, min and zero ad id
 bool subAddTribeExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, INT_MAX, "max int") ==
                 ELECTION_SUCCESS);
@@ -159,6 +187,15 @@ bool subAddTribeExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, INT_MIN, "min int") ==
                 ELECTION_INVALID_ID);
     ASSERT_TEST(electionGetTribeName(sample, INT_MIN) == NULL);
+    return true;
+}
+
+// Test removing and readding tribe
+bool subRemoveTribeReadd(Election sample) {
+    ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddTribe(sample, 11, "re added") == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 11), "re added") == 0);
+    ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
     return true;
 }
 
@@ -255,6 +292,7 @@ bool subAddAreaValidName(Election sample) {
     return true;
 }
 
+// Checking on edge cases integers. Max, min and zero ad id
 bool subAddAreaExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddArea(sample, INT_MAX, "max int") ==
                 ELECTION_SUCCESS);
@@ -268,6 +306,16 @@ bool subAddAreaExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddArea(sample, INT_MIN, "min int") ==
                 ELECTION_INVALID_ID);
     // ASSERT_TEST(electionGetAreaName(sample, INT_MIN) == NULL);
+    return true;
+}
+
+// Test removing and readding area
+bool subRemoveAreaReadd(Election sample) {
+    ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(sample, 21, "re added") == ELECTION_SUCCESS);
+    ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
+                ELECTION_SUCCESS);
     return true;
 }
 
@@ -289,9 +337,13 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeValidName, "Valid Tribe Names");
     TEST_WITH_SAMPLE(subAddTribeVerifyStringsDereferencing,
                      "Dereferencing String Tribe Name");
-    TEST_WITH_SAMPLE(subAddTribeExtremeIdValues, "Verify Extreme Id Values");
+    TEST_WITH_SAMPLE(subAddTribeExtremeIdValues,
+                     "Verify Tribe Extreme Id Values");
 }
-void testRemoveTribe() {}
+void testRemoveTribe() {
+    printf("Testing %s tests:\n", "'Remove Tribe'");
+    TEST_WITH_SAMPLE(subRemoveTribeReadd, "Re-Adding Tribe");
+}
 void testAddArea() {
     printf("Testing %s tests:\n", "'Add Area'");
     TEST_WITH_SAMPLE(subAddAreaInvalidId, "Invalid Area ID");
@@ -302,9 +354,13 @@ void testAddArea() {
     TEST_WITH_SAMPLE(subAddAreaValidName, "Valid Area Names");
     // TEST_WITH_SAMPLE(subAddAreaVerifyStringsDereferencing,
     //                  "Dereferencing String Area Name");
-    TEST_WITH_SAMPLE(subAddAreaExtremeIdValues, "Verify Extreme Id Values");
+    TEST_WITH_SAMPLE(subAddAreaExtremeIdValues,
+                     "Verify Area Extreme Id Values");
 }
-void testRemoveArea() {}
+void testRemoveArea() {
+    printf("Testing %s tests:\n", "'Remove Area'");
+    TEST_WITH_SAMPLE(subRemoveAreaReadd, "Re-Adding Area");
+}
 void testRemoveAreas() {}
 void testAddVote() {}
 void testRemoveVote() {}
@@ -334,12 +390,44 @@ void (*tests[])(void) = {testCreate,
                          NULL};
 
 int main(int argc, char* argv[]) {
+#ifdef WITH_FORK
+    pid_t pid;
+    int exit_code;
+#endif
     for (int test_idx = 0; tests[test_idx] != NULL; test_idx++) {
+#ifdef WITH_FORK
+        pid = fork();
+
+        if (pid < 0) {
+            fprintf(stderr, "Forking process failed for test index %d\n",
+                    test_idx);
+        } else if (pid == 0) {
+            // We're in the subprocess
+            tests[test_idx]();
+            // We don't want to continue the loop after the current test in the
+            // subprocess. The main process will do it anyways
+            return g_status == true ? 0 : 1;
+        } else {
+            // We're in the parrent process
+            if (waitpid(pid, &exit_code, 0) != pid) {
+                exit_code = -1;
+            }
+            if (exit_code != 0) {
+                g_status = false;
+            }
+        }
+#else
         tests[test_idx]();
+#endif
     }
+
     if (g_status) {
+        printf("All tests finishes successfully\n");
         return 0;
     } else {
-        return -1;
+        fprintf(stderr,
+                "One or more tests have failed. See above log for more "
+                "information.\n");
+        return 1;
     }
 }
