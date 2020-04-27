@@ -5,6 +5,8 @@
 
 #include "../mtm_map/map.h"
 #include "test_utilities.h"
+#include "utils.h"
+
 bool testMapCreate() {
     printf("Testing mapCreate\n");
     Map map1 = mapCreate();
@@ -240,30 +242,6 @@ bool testMapRemove() {
     ASSERT_TEST(mapGetSize(map1) == 2);
     mapDestroy(map1);
     return true;
-}
-
-char *randString(int length) {
-    char *string =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
-    size_t string_len = strlen(string);
-    char *random_string = NULL;
-
-    if (length < 1) {
-        length = 1;
-    }
-    random_string = malloc(sizeof(char) * (length + 1));
-    if (random_string == NULL) {
-        return NULL;
-    }
-    short key = 0;
-    for (int n = 0; n < length; n++) {
-        key = rand() % string_len;
-        random_string[n] = string[key];
-    }
-
-    random_string[length] = '\0';
-
-    return random_string;
 }
 
 bool doomsDay() {
