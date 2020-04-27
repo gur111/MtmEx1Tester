@@ -2,12 +2,22 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "../election/election.h"
 #include "../mtm_map/map.h"
 #include "utils.h"
 
 #define STRESS_INVERTALS_MODIFIER 10000
+
+#ifdef __unix__
+#define WITH_FORK
+// Fuck Microsoft and all it stands for.
+// If you need to debug on this shitty OS, get the errors one by one.
+// Also, good luck. You'll need it
+#endif
 
 #ifdef __unix__
 #define WITH_FORK
@@ -176,6 +186,7 @@ bool subAddTribeValidName(Election sample) {
     return true;
 }
 
+// Checking on edge cases integers. Max, min and zero ad id
 bool subAddTribeExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, INT_MAX, "max int") ==
                 ELECTION_SUCCESS);
@@ -293,6 +304,7 @@ bool subAddAreaValidName(Election sample) {
     return true;
 }
 
+// Checking on edge cases integers. Max, min and zero ad id
 bool subAddAreaExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddArea(sample, INT_MAX, "max int") ==
                 ELECTION_SUCCESS);
@@ -373,9 +385,13 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeValidName, "Valid Tribe Names");
     TEST_WITH_SAMPLE(subAddTribeVerifyStringsDereferencing,
                      "Dereferencing String Tribe Name");
-    TEST_WITH_SAMPLE(subAddTribeExtremeIdValues, "Verify Extreme Id Values");
+    TEST_WITH_SAMPLE(subAddTribeExtremeIdValues,
+                     "Verify Tribe Extreme Id Values");
 }
-void testRemoveTribe() {}
+void testRemoveTribe() {
+    printf("Testing %s tests:\n", "'Remove Tribe'");
+    TEST_WITH_SAMPLE(subRemoveTribeReadd, "Re-Adding Tribe");
+}
 void testAddArea() {
     printf("Testing %s tests:\n", "'Add Area'");
     TEST_WITH_SAMPLE(subAddAreaInvalidId, "Invalid Area ID");
@@ -386,9 +402,13 @@ void testAddArea() {
     TEST_WITH_SAMPLE(subAddAreaValidName, "Valid Area Names");
     // TEST_WITH_SAMPLE(subAddAreaVerifyStringsDereferencing,
     //                  "Dereferencing String Area Name");
-    TEST_WITH_SAMPLE(subAddAreaExtremeIdValues, "Verify Extreme Id Values");
+    TEST_WITH_SAMPLE(subAddAreaExtremeIdValues,
+                     "Verify Area Extreme Id Values");
 }
-void testRemoveArea() {}
+void testRemoveArea() {
+    printf("Testing %s tests:\n", "'Remove Area'");
+    TEST_WITH_SAMPLE(subRemoveAreaReadd, "Re-Adding Area");
+}
 void testRemoveAreas() {}
 void testAddVote() {}
 void testRemoveVote() {}
@@ -420,12 +440,44 @@ void (*tests[])(void) = {testCreate,
                          NULL};
 
 int main(int argc, char* argv[]) {
+#ifdef WITH_FORK
+    pid_t pid;
+    int exit_code;
+#endif
     for (int test_idx = 0; tests[test_idx] != NULL; test_idx++) {
+#ifdef WITH_FORK
+        pid = fork();
+
+        if (pid < 0) {
+            fprintf(stderr, "Forking process failed for test index %d\n",
+                    test_idx);
+        } else if (pid == 0) {
+            // We're in the subprocess
+            tests[test_idx]();
+            // We don't want to continue the loop after the current test in the
+            // subprocess. The main process will do it anyways
+            return g_status == true ? 0 : 1;
+        } else {
+            // We're in the parrent process
+            if (waitpid(pid, &exit_code, 0) != pid) {
+                exit_code = -1;
+            }
+            if (exit_code != 0) {
+                g_status = false;
+            }
+        }
+#else
         tests[test_idx]();
+#endif
     }
+
     if (g_status) {
+        printf("All tests finishes successfully\n");
         return 0;
     } else {
-        return -1;
+        fprintf(stderr,
+                "One or more tests have failed. See above log for more "
+                "information.\n");
+        return 1;
     }
 }
