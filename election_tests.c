@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -127,6 +128,9 @@ bool subAddTribeInvalidName(Election sample) {
                 ELECTION_INVALID_NAME);
     ASSERT_TEST(electionAddTribe(sample, 1, "bell\bname") ==
                 ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "Beginning") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 1, "endinG") == ELECTION_INVALID_NAME);
     return true;
 }
 
@@ -144,12 +148,25 @@ bool subAddTribeValidName(Election sample) {
     return true;
 }
 
-// TODO: Think of a better name
+bool subAddTribeExtremeIdValues(Election sample) {
+    ASSERT_TEST(electionAddTribe(sample, INT_MAX, "max int") ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, INT_MAX), "max int") == 0);
+
+    ASSERT_TEST(electionAddTribe(sample, 0, "zero id") == ELECTION_SUCCESS);
+    ASSERT_TEST(strcmp(electionGetTribeName(sample, 0), "zero id") == 0);
+
+    ASSERT_TEST(electionAddTribe(sample, INT_MIN, "min int") ==
+                ELECTION_INVALID_ID);
+    ASSERT_TEST(electionGetTribeName(sample, INT_MIN) == NULL);
+    return true;
+}
+
 /**
  * This test makes sure the string sent to tribe as name is copied and not
  * merely the same instance is used
  */
-bool subAddTribeCopyString(Election sample) {
+bool subAddTribeVerifyStringsDereferencing(Election sample) {
     char name[] = "some name";
     ASSERT_TEST(electionAddTribe(sample, 1, name) == ELECTION_SUCCESS);
     ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), name) == 0);
@@ -176,7 +193,9 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeExist, "Pre Existing Tribe/TribeId");
     TEST_WITH_SAMPLE(subAddTribeInvalidName, "Invalid Tribe Names");
     TEST_WITH_SAMPLE(subAddTribeValidName, "Valid Tribe Names");
-    TEST_WITH_SAMPLE(subAddTribeCopyString, "Dereferencing String Tribe Name");
+    TEST_WITH_SAMPLE(subAddTribeVerifyStringsDereferencing,
+                     "Dereferencing String Tribe Name");
+    TEST_WITH_SAMPLE(subAddTribeExtremeIdValues, "Verify Extreme Id Values");
     // TODO:
     // TODO:
     // TODO:
