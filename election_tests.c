@@ -418,6 +418,7 @@ void testGetTribeName() {}
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
+    printf("Testing %s tests:\n", "'Dooms` Day'");
     TEST_WITH_SAMPLE(subStressAddRemoveRepeat, "Rapid Add and Remove");
     TEST_WITH_SAMPLE(subStressAddThenRemove, "Fill Up Then Clear One By One");
 }
