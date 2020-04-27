@@ -5,6 +5,7 @@
 
 #include "../mtm_map/map.h"
 #include "test_utilities.h"
+
 #include "utils.h"
 
 bool testMapCreate() {
