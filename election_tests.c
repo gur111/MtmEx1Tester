@@ -74,7 +74,7 @@ void cleanUp(Election election) { electionDestroy(election); }
  */
 
 bool subAddTribeInvalidId(Election sample) {
-    ASSERT_TEST(electionAddTribe(sample, -1, "InvalidTribe") ==
+    ASSERT_TEST(electionAddTribe(sample, -1, "invalid tribe id") ==
                 ELECTION_INVALID_ID);
     // Verify it wasn't added
     ASSERT_TEST(electionGetTribeName(sample, -1) == NULL);
@@ -177,6 +177,100 @@ bool subAddTribeVerifyStringsDereferencing(Election sample) {
     return true;
 }
 
+bool subAddAreaInvalidId(Election sample) {
+    ASSERT_TEST(electionAddArea(sample, -1, "invalid area") ==
+                ELECTION_INVALID_ID);
+    // Verify it wasn't added
+    // ASSERT_TEST(electionGetAreaName(sample, -1) == NULL); TODO: What do we
+    // check here?
+    return true;
+}
+
+bool subAddAreaExist(Election sample) {
+    // Existing ID
+    ASSERT_TEST(electionAddArea(sample, 21, "id exist") ==
+                ELECTION_AREA_ALREADY_EXIST);
+    // Existing Name
+    ASSERT_TEST(electionAddArea(sample, 1, "area a") == ELECTION_SUCCESS);
+    // Make sure names match
+    // TODO: How can we verify this
+    // ASSERT_TEST(strcmp(electionGetAreaName(sample, 1),
+    //                    electionGetAreaName(sample, 11)) == 0);
+    // Make sure the names are different instances
+    // ASSERT_TEST(electionGetAreaName(sample, 1) !=
+    //             electionGetAreaName(sample, 11));
+
+    return true;
+}
+
+bool subAddAreaLongName(Election sample) {
+    ASSERT_TEST(electionAddArea(sample, 1, SUPER_LONG_STRING) ==
+                ELECTION_SUCCESS);
+    // TODO: What else can we verify here?
+    // ASSERT_TEST(electionGetTribeName(sample, 1) != NULL);
+    // ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), SUPER_LONG_STRING) ==
+    // 0);
+    return true;
+}
+
+bool subAddAreaInvalidName(Election sample) {
+    ASSERT_TEST(electionAddArea(sample, 1, "UPPER CASE INVALID") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "names.with.dots.invalid") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "hyphens-are-invalid-too") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "underscores_as_well") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "comma,is not valid") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "exclamation!mark") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "question?mark") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "new\nline") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "tab\tname") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "bell\bname") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "Beginning") ==
+                ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddArea(sample, 1, "endinG") == ELECTION_INVALID_NAME);
+    return true;
+}
+
+bool subAddAreaValidName(Election sample) {
+    ASSERT_TEST(electionAddArea(sample, 1, "names with spaces") ==
+                ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(sample, 2, "nospaces") == ELECTION_SUCCESS);
+    // TODO: How can we verify
+    // ASSERT_TEST(strcmp(electionGetTribeName(sample, 2), "nospaces") == 0);
+    // Check empty string
+    ASSERT_TEST(electionAddArea(sample, 3, "") == ELECTION_SUCCESS);
+    // ASSERT_TEST(strcmp(electionGetTribeName(sample, 3), "") == 0);
+    // String with only space
+    ASSERT_TEST(electionAddArea(sample, 4, " ") == ELECTION_SUCCESS);
+    // ASSERT_TEST(strcmp(electionGetTribeName(sample, 4), " ") == 0);
+    return true;
+}
+
+bool subAddAreaExtremeIdValues(Election sample) {
+    ASSERT_TEST(electionAddArea(sample, INT_MAX, "max int") ==
+                ELECTION_SUCCESS);
+    // TODO: We want to verify it was actually added. Maybe try adding a vote
+    // ASSERT_TEST(strcmp(electionGetAreaName(sample, INT_MAX), "max int") ==
+    // 0);
+
+    ASSERT_TEST(electionAddArea(sample, 0, "zero id") == ELECTION_SUCCESS);
+    // ASSERT_TEST(strcmp(electionGetTribeName(sample, 0), "zero id") == 0);
+
+    ASSERT_TEST(electionAddArea(sample, INT_MIN, "min int") ==
+                ELECTION_INVALID_ID);
+    // ASSERT_TEST(electionGetAreaName(sample, INT_MIN) == NULL);
+    return true;
+}
+
 // END SUBTESTS
 
 /**
@@ -187,7 +281,7 @@ bool subAddTribeVerifyStringsDereferencing(Election sample) {
 
 void testCreate() {}
 void testAddTribe() {
-    printf("Testing %s tests...\n", "'Add Tribe'");
+    printf("Testing %s tests:\n", "'Add Tribe'");
     TEST_WITH_SAMPLE(subAddTribeInvalidId, "Invalid Tribe ID");
     TEST_WITH_SAMPLE(subAddTribeLongName, "Long Tribe Name");
     TEST_WITH_SAMPLE(subAddTribeExist, "Pre Existing Tribe/TribeId");
@@ -196,14 +290,20 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeVerifyStringsDereferencing,
                      "Dereferencing String Tribe Name");
     TEST_WITH_SAMPLE(subAddTribeExtremeIdValues, "Verify Extreme Id Values");
-    // TODO:
-    // TODO:
-    // TODO:
-    // TODO:
-    // TODO:
 }
 void testRemoveTribe() {}
-void testAddArea() {}
+void testAddArea() {
+    printf("Testing %s tests:\n", "'Add Area'");
+    TEST_WITH_SAMPLE(subAddAreaInvalidId, "Invalid Area ID");
+    TEST_WITH_SAMPLE(subAddAreaLongName, "Long Area Name");
+    TEST_WITH_SAMPLE(subAddAreaExist, "Pre Existing Area/AreaId");
+    TEST_WITH_SAMPLE(subAddAreaInvalidName, "Invalid Area Names");
+    // TODO: Add this case
+    TEST_WITH_SAMPLE(subAddAreaValidName, "Valid Area Names");
+    // TEST_WITH_SAMPLE(subAddAreaVerifyStringsDereferencing,
+    //                  "Dereferencing String Area Name");
+    TEST_WITH_SAMPLE(subAddAreaExtremeIdValues, "Verify Extreme Id Values");
+}
 void testRemoveArea() {}
 void testRemoveAreas() {}
 void testAddVote() {}
