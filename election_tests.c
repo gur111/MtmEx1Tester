@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #include "../election/election.h"
 #include "../mtm_map/map.h"
 #include "utils.h"
@@ -21,7 +22,7 @@
 #endif
 
 #ifdef __MACH__
-#define WITH_FORK
+//#define WITH_FORK
 // Fuck Microsoft and all it stands for.
 // If you need to debug on this shitty OS, get the errors one by one.
 // Also, good luck. You'll need it
@@ -238,7 +239,7 @@ bool subRemoveTribeNotExist(Election sample) {
 bool subRemoveTribeWithVotes(Election sample) {
     assert(electionAddVote(sample, 21, 11, 3) == ELECTION_SUCCESS);
     assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
-    //todo: check with the map compute the result
+    // todo: check with the map compute the result
     return true;
 }
 
@@ -352,14 +353,21 @@ bool subAddAreaExtremeIdValues(Election sample) {
     return true;
 }
 
-// Test removing and readding area
-bool subRemoveAreaReadd(Election sample) {
+// Test removing and ReAdding area
+bool subRemoveAreaReAdd(Election sample) {
     ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
                 ELECTION_SUCCESS);
     ASSERT_TEST(electionAddArea(sample, 21, "re added") == ELECTION_SUCCESS);
     ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
                 ELECTION_SUCCESS);
     ASSERT_TEST(electionAddArea(sample, 21, "and again") == ELECTION_SUCCESS);
+    return true;
+}
+/**
+ * sub tests for adding votes.
+ */
+bool subAddVotesNullArgument(Election sample) {
+    assert(electionAddVote(NULL, 21, 11, 1) == ELECTION_NULL_ARGUMENT);
     return true;
 }
 
@@ -395,9 +403,36 @@ bool subStressAddThenRemove(Election sample) {
         ASSERT_TEST(electionRemoveTribe(sample, i + 100) == ELECTION_SUCCESS);
         // TODO: Add some votes
     }
-
     return status;
 }
+
+bool subAddVotesInvalidId(Election sample) {
+    assert(electionAddVote(sample, -1, 11, 2) == ELECTION_INVALID_ID);
+    assert(electionAddVote(sample, 21, -11, 2) == ELECTION_INVALID_ID);
+
+    assert(electionAddArea(sample, 0, "zero area") == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 0, 11, 2) == ELECTION_SUCCESS);
+    assert(electionAddTribe(sample, 0, "zero tribe") == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 21, 0, 3) == ELECTION_SUCCESS);
+
+    assert(electionAddVote(sample, 11, 21, -1) == ELECTION_INVALID_VOTES);
+    assert(electionAddVote(sample, 11, 21, 0) == ELECTION_SUCCESS);
+    return true;
+}
+
+bool subAddVotesNotExits(Election sample) {
+    assert(electionAddVote(sample, 99, 11, 3) == ELECTION_AREA_NOT_EXIST);
+    assert(electionAddVote(sample, 21, 99, 3) == ELECTION_TRIBE_NOT_EXIST);
+
+    assert(electionAddVote(sample, 21, 11, 1) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 22, 12, 2) == ELECTION_SUCCESS);
+    assert(electionRemoveAreas(sample, specificArea(21)) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 21, 11, 1) == ELECTION_AREA_NOT_EXIST);
+    assert(electionRemoveTribe(sample, 12) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 25, 12, 5) == ELECTION_TRIBE_NOT_EXIST);
+    return true;
+}
+
 // END SUBTESTS
 
 /**
@@ -406,10 +441,7 @@ bool subStressAddThenRemove(Election sample) {
  * possible.
  */
 
-void testCreate() {
-    printf("Testing %s tests:\n", "'Create Map'");
-
-}
+void testCreate() { printf("Testing %s tests:\n", "'Create Map'"); }
 
 void testAddTribe() {
     printf("Testing %s tests:\n", "'Add Tribe'");
@@ -449,12 +481,17 @@ void testAddArea() {
 
 void testRemoveArea() {
     printf("Testing %s tests:\n", "'Remove Area'");
-    TEST_WITH_SAMPLE(subRemoveAreaReadd, "Re-Adding Area");
+    TEST_WITH_SAMPLE(subRemoveAreaReAdd, "Re-Adding Area");
 }
 
 void testRemoveAreas() {}
 
-void testAddVote() {}
+void testAddVote() {
+    TEST_WITH_SAMPLE(subAddVotesNullArgument, "Inserting Null argument");
+    TEST_WITH_SAMPLE(subAddVotesInvalidId, "Inserting Invalid Id");
+    TEST_WITH_SAMPLE(subAddVotesNotExits,
+                     "Inserting non existing areas and tribes");
+}
 
 void testRemoveVote() {}
 
