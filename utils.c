@@ -1,7 +1,10 @@
 #include "utils.h"
 
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define MALLOC_FAIL_CHANCE 10
 
 char *randString(int length) {
     char *string =
@@ -28,8 +31,7 @@ char *randString(int length) {
 }
 
 char *randLowerString(int length) {
-    char *string =
-        "abcdefghijklmnopqrstuvwxyz ";
+    char *string = "abcdefghijklmnopqrstuvwxyz ";
     size_t string_len = strlen(string);
     char *random_string = NULL;
 
@@ -49,4 +51,22 @@ char *randLowerString(int length) {
     random_string[length] = '\0';
 
     return random_string;
+}
+
+void *xmalloc(size_t size) {
+    // Whether the function should randomly fail
+    static bool should_fail = false;
+    if (size == -1) {
+        should_fail = true;
+        return NULL;
+    } else if (size == -2) {
+        should_fail = false;
+        return NULL;
+    }
+
+    if (rand() % MALLOC_FAIL_CHANCE == 0) {
+        printf("Out of memory simulated\n");
+        return NULL;
+    }
+    return (malloc(size));
 }
