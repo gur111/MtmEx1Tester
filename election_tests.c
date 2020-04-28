@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
 #include "../election/election.h"
 #include "../mtm_map/map.h"
 #include "utils.h"
@@ -21,8 +20,8 @@
 // Also, good luck. You'll need it
 #endif
 
-#ifdef __unix__
-#define WITH_FORK
+#ifdef __MACH__
+//#define WITH_FORK
 // Fuck Microsoft and all it stands for.
 // If you need to debug on this shitty OS, get the errors one by one.
 // Also, good luck. You'll need it
@@ -204,12 +203,42 @@ bool subAddTribeExtremeIdValues(Election sample) {
 }
 
 // Test removing and readding tribe
+/**
+ * sub tests for removing tribes.
+ */
 bool subRemoveTribeReadd(Election sample) {
     ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 11, "re added") == ELECTION_SUCCESS);
     ASSERT_TEST(strcmp(electionGetTribeName(sample, 11), "re added") == 0);
     ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 11, "and again") == ELECTION_SUCCESS);
+    return true;
+}
+
+bool subRemoveTribeNullArgument(Election sample) {
+    assert(electionRemoveTribe(NULL, 1) == ELECTION_NULL_ARGUMENT);
+    return true;
+}
+
+bool subRemoveTribeInvalidId(Election sample) {
+    assert(electionRemoveTribe(sample, -1) == ELECTION_INVALID_ID);
+    assert(electionAddTribe(sample, 0, "adding id zero") == ELECTION_SUCCESS);
+    assert(electionRemoveTribe(sample, 0) == ELECTION_SUCCESS);
+    return true;
+}
+
+bool subRemoveTribeNotExist(Election sample) {
+    assert(electionRemoveTribe(sample, 1) == ELECTION_TRIBE_NOT_EXIST);
+    assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample, 11) == NULL);
+    assert(electionRemoveTribe(sample, 11) == ELECTION_TRIBE_NOT_EXIST);
+    return true;
+}
+
+bool subRemoveTribeWithVotes(Election sample) {
+    assert(electionAddVote(sample, 21, 11, 3) == ELECTION_SUCCESS);
+    assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    //todo: check with the map compute the result
     return true;
 }
 
@@ -377,7 +406,11 @@ bool subStressAddThenRemove(Election sample) {
  * possible.
  */
 
-void testCreate() {}
+void testCreate() {
+    printf("Testing %s tests:\n", "'Create Map'");
+
+}
+
 void testAddTribe() {
     printf("Testing %s tests:\n", "'Add Tribe'");
     TEST_WITH_SAMPLE(subAddTribeInvalidId, "Invalid Tribe ID");
@@ -390,10 +423,16 @@ void testAddTribe() {
     TEST_WITH_SAMPLE(subAddTribeExtremeIdValues,
                      "Verify Tribe Extreme Id Values");
 }
+
 void testRemoveTribe() {
     printf("Testing %s tests:\n", "'Remove Tribe'");
     TEST_WITH_SAMPLE(subRemoveTribeReadd, "Re-Adding Tribe");
+    TEST_WITH_SAMPLE(subRemoveTribeNullArgument, "Inserting Null argument");
+    TEST_WITH_SAMPLE(subRemoveTribeInvalidId, "Inserting Invalid Id");
+    TEST_WITH_SAMPLE(subRemoveTribeNotExist, "Removing a non existing tribe");
+    TEST_WITH_SAMPLE(subRemoveTribeWithVotes, "adding votes");
 }
+
 void testAddArea() {
     printf("Testing %s tests:\n", "'Add Area'");
     TEST_WITH_SAMPLE(subAddAreaInvalidId, "Invalid Area ID");
@@ -407,16 +446,24 @@ void testAddArea() {
     TEST_WITH_SAMPLE(subAddAreaExtremeIdValues,
                      "Verify Area Extreme Id Values");
 }
+
 void testRemoveArea() {
     printf("Testing %s tests:\n", "'Remove Area'");
     TEST_WITH_SAMPLE(subRemoveAreaReadd, "Re-Adding Area");
 }
+
 void testRemoveAreas() {}
+
 void testAddVote() {}
+
 void testRemoveVote() {}
+
 void testComputeAreasToTribesMapping() {}
+
 void testSetTribeName() {}
+
 void testGetTribeName() {}
+
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
@@ -424,6 +471,7 @@ void testDoomsDay() {
     TEST_WITH_SAMPLE(subStressAddRemoveRepeat, "Rapid Add and Remove");
     TEST_WITH_SAMPLE(subStressAddThenRemove, "Fill Up Then Clear One By One");
 }
+
 void testDestroy() {}
 
 /*The functions for the tests should be added here*/
@@ -442,7 +490,7 @@ void (*tests[])(void) = {testCreate,
                          testDoomsDay,
                          NULL};
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 #ifdef WITH_FORK
     pid_t pid;
     int exit_code;
