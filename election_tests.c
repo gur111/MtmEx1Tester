@@ -22,7 +22,7 @@
 #endif
 
 #ifdef __MACH__
-#define WITH_FORK
+//#define WITH_FORK
 // Fuck Microsoft and all it stands for.
 // If you need to debug on this shitty OS, get the errors one by one.
 // Also, good luck. You'll need it
