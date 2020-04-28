@@ -353,6 +353,8 @@ bool subRemoveAreaReAdd(Election sample) {
  */
 bool subAddVotesNullArgument(Election sample) {
     assert(electionAddVote(NULL, 21, 11, 1) == ELECTION_NULL_ARGUMENT);
+    assert(electionAddVote(sample, 21, 11, 1) == ELECTION_SUCCESS);
+    assert(electionRemoveVote(NULL, 22, 21, 1) == ELECTION_NULL_ARGUMENT);
     return true;
 }
 
@@ -370,19 +372,46 @@ bool subAddVotesInvalidId(Election sample) {
     return true;
 }
 
-bool subAddVotesNotExits(Election sample){
-    assert(electionAddVote(sample,99,11,3)==ELECTION_AREA_NOT_EXIST);
-    assert(electionAddVote(sample,21,99,3)==ELECTION_TRIBE_NOT_EXIST);
+bool subAddVotesNotExits(Election sample) {
+    assert(electionAddVote(sample, 99, 11, 3) == ELECTION_AREA_NOT_EXIST);
+    assert(electionAddVote(sample, 21, 99, 3) == ELECTION_TRIBE_NOT_EXIST);
 
     assert(electionAddVote(sample, 21, 11, 1) == ELECTION_SUCCESS);
     assert(electionAddVote(sample, 22, 12, 2) == ELECTION_SUCCESS);
-    assert(electionRemoveAreas(sample,specificArea(21))==ELECTION_SUCCESS);
-    assert(electionAddVote(sample,21,11,1)==ELECTION_AREA_NOT_EXIST);
-    assert(electionRemoveTribe(sample,12)==ELECTION_SUCCESS);
-    assert(electionAddVote(sample,25,12,5)==ELECTION_TRIBE_NOT_EXIST);
+    assert(electionRemoveAreas(sample, specificArea(21)) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 21, 11, 1) == ELECTION_AREA_NOT_EXIST);
+    assert(electionRemoveTribe(sample, 12) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 25, 12, 5) == ELECTION_TRIBE_NOT_EXIST);
+    return true;
+}
+/**
+ * sub tests for removing  votes.
+ */
+bool subRemoveVotesInvalidId(Election sample) {
+    assert(electionRemoveVote(sample, -1, 11, 2) == ELECTION_INVALID_ID);
+    assert(electionRemoveVote(sample, 21, -11, 2) == ELECTION_INVALID_ID);
+
+    assert(electionAddArea(sample, 0, "zero area") == ELECTION_SUCCESS);
+    assert(electionRemoveVote(sample, 0, 11, 2) == ELECTION_SUCCESS);
+    assert(electionAddTribe(sample, 0, "zero tribe") == ELECTION_SUCCESS);
+    assert(electionRemoveVote(sample, 21, 0, 3) == ELECTION_SUCCESS);
+
+    assert(electionRemoveVote(sample, 11, 21, -1) == ELECTION_INVALID_VOTES);
+    assert(electionRemoveVote(sample, 11, 21, 0) == ELECTION_INVALID_VOTES);
     return true;
 }
 
+bool subRemoveVotesNonExisting(Election sample) {
+    assert(electionAddVote(sample, 21, 11, 4) == ELECTION_SUCCESS);
+    assert(electionRemoveVote(sample, 99, 11, 3) == ELECTION_AREA_NOT_EXIST);
+    assert(electionRemoveVote(sample, 21, 99, 2) == ELECTION_TRIBE_NOT_EXIST);
+
+    assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    assert(electionRemoveVote(sample, 21, 11, 2) == ELECTION_TRIBE_NOT_EXIST);
+    assert(electionRemoveAreas(sample, specificArea(24)) == ELECTION_SUCCESS);
+    assert(electionRemoveVote(sample, 24, 13, 3) == ELECTION_AREA_NOT_EXIST);
+    return true;
+}
 // END SUBTESTS
 
 /**
@@ -442,10 +471,13 @@ void testRemoveAreas() {}
 void testAddVote() {
     TEST_WITH_SAMPLE(subAddVotesNullArgument, "Inserting Null argument");
     TEST_WITH_SAMPLE(subAddVotesInvalidId, "Inserting Invalid Id");
-    TEST_WITH_SAMPLE(subAddVotesNotExits,"Inserting non existing areas and tribes");
+    TEST_WITH_SAMPLE(subAddVotesNotExits, "Inserting non existing areas and tribes");
 }
 
-void testRemoveVote() {}
+void testRemoveVote() {
+    TEST_WITH_SAMPLE(subRemoveVotesInvalidId, "Inserting Invalid Id");
+    TEST_WITH_SAMPLE(subRemoveVotesNonExisting, "Non Existing tribes and areas");
+}
 
 void testComputeAreasToTribesMapping() {}
 
