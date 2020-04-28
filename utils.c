@@ -56,10 +56,10 @@ char *randLowerString(int length) {
 void *xmalloc(size_t size) {
     // Whether the function should randomly fail
     static bool should_fail = false;
-    if (size == -1) {
+    if (size == XMALLOC_MAKE_UNSTABLE) {
         should_fail = true;
         return NULL;
-    } else if (size == -2) {
+    } else if (size == XMALLOC_MAKE_STABLE) {
         should_fail = false;
         return NULL;
     }
