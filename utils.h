@@ -3,15 +3,14 @@
 char *randString(int length);
 char *randLowerString(int length);
 
-enum { XMALLOC_MAKE_UNSTABLE = -1, XMALLOC_MAKE_STABLE = -2 };
 /**
- * Will randomly fail. To help simulate memory errors.
+ * Will fail after X mallocs. To help simulate memory errors.
  * To easily use you can do in the beginning of your code:
  * #define malloc xmalloc
  * Before the unstable_malloc can fail you need to call it with:
- * size = XMALLOC_MAKE_UNSTABLE.
+ * size = -X. While X is malloc in which the allocation will fail.
  * To make it stable you need to call it with:
- * size = XMALLOC_MAKE_STABLE.
+ * size = 0.
  * By default it will not fail and will act exactly like
  * malloc acts.
  */

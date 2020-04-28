@@ -1,6 +1,5 @@
 #include "utils.h"
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,19 +53,22 @@ char *randLowerString(int length) {
 }
 
 void *xmalloc(size_t size) {
-    // Whether the function should randomly fail
-    static bool should_fail = false;
-    if (size == XMALLOC_MAKE_UNSTABLE) {
-        should_fail = true;
-        return NULL;
-    } else if (size == XMALLOC_MAKE_STABLE) {
-        should_fail = false;
+    // The function will fail on the `fail_after`th malloc.
+    // Zero mean never simulate failure
+    static int fail_after = 0;
+    if (size <= 0) {
+        fail_after = -size;
         return NULL;
     }
 
-    if (rand() % MALLOC_FAIL_CHANCE == 0) {
+    if (fail_after == 1) {
         printf("Out of memory simulated\n");
+        fail_after = 0;
         return NULL;
     }
+    if (fail_after > 0) {
+        fail_after--;
+    }
+    assert(fail_after >= 0);
     return (malloc(size));
 }

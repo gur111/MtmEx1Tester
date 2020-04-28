@@ -9,6 +9,8 @@
 #include "../election/election.h"
 #include "../mtm_map/map.h"
 #include "utils.h"
+// Allow malloc to be unstable
+#define malloc xmalloc
 
 #define STRESS_INVERTALS_MODIFIER 10000
 
