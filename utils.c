@@ -1,8 +1,9 @@
 #include "utils.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+
 #define MALLOC_FAIL_CHANCE 10
 
 char *randString(int length) {
