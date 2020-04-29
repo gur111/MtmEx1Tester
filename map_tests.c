@@ -5,7 +5,6 @@
 
 #include "../mtm_map/map.h"
 #include "test_utilities.h"
-
 #include "utils.h"
 
 bool testMapCreate() {
@@ -270,13 +269,14 @@ bool doomsDay() {
 
 int main(int argc, char *argv[]) {
     printf("Start Map Tests\n");
-    testMapPutGet();
-    testMapCopy();
-    testMapGetSize();
-    testMapCreate();
-    testMapContains();
-    testMapRemove();
-    doomsDay();
+    bool status = true;
+    status = status && testMapPutGet();
+    status = status && testMapCopy();
+    status = status && testMapGetSize();
+    status = status && testMapCreate();
+    status = status && testMapContains();
+    status = status && testMapRemove();
+    status = status && doomsDay();
     printf("end Map Tests\n");
-    return 0;
+    return status ? 0 : 1;
 }

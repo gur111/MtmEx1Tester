@@ -337,11 +337,11 @@ bool subStressAddRemoveRepeat(Election sample) {
     const int iterations = STRESS_INVERTALS_MODIFIER * 10;
 
     for (int i = 0; i < iterations; i++) {
-        status = status | subRemoveTribeReadd(sample);
+        status = status && subRemoveTribeReadd(sample);
     }
     // TODO Add some votes. Can rely on computation test
     for (int i = 0; i < iterations; i++) {
-        status = status | subRemoveAreaReadd(sample);
+        status = status && subRemoveAreaReadd(sample);
         // TODO: Add some votes
     }
 
