@@ -391,7 +391,7 @@ bool subStressAddRemoveRepeat(Election sample) {
     }
     // TODO Add some votes. Can rely on computation test
     for (int i = 0; i < iterations; i++) {
-        status = status && subRemoveAreaReadd(sample);
+        status = status && subRemoveAreaReAdd(sample);
         // TODO: Add some votes
     }
 
@@ -680,8 +680,7 @@ int main(int argc, char *argv[]) {
             // We're in the parrent process
             if (waitpid(pid, &exit_code, 0) != pid) {
                 exit_code = -1;
-            }
-            if (exit_code != 0) {
+            } if (exit_code != 0) {
                 g_status = false;
             }
         }
