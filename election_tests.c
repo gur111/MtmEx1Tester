@@ -243,10 +243,10 @@ bool subRemoveTribeWithVotes(Election sample) {
     return true;
 }
 
-bool subRemoveTribeFirstMiddelLast(Election sample){
-    assert(electionRemoveTribe(sample,11) ==ELECTION_SUCCESS);
-    assert(electionRemoveTribe(sample,15) ==ELECTION_SUCCESS);
-    assert(electionRemoveTribe(sample,13) ==ELECTION_SUCCESS);
+bool subRemoveTribeFirstMiddelLast(Election sample) {
+    assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    assert(electionRemoveTribe(sample, 15) == ELECTION_SUCCESS);
+    assert(electionRemoveTribe(sample, 13) == ELECTION_SUCCESS);
     return true;
 }
 
@@ -516,12 +516,31 @@ bool subGetTribeNameNullArgument(Election sample) {
     assert(electionGetTribeName(NULL, 11) == NULL);
     return true;
 }
-bool subGetTribeNameComperingStrings(Election sample){
-    assert(electionGetTribeName(sample,11) == "tribe a");
-    assert(electionRemoveTribe(sample,11) == ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample,11) == NULL);
-    assert(electionAddTribe(sample,11,"new tribe")==ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample,11) == "new tribe");
+
+bool subGetTribeNameComperingStrings(Election sample) {
+    assert(electionGetTribeName(sample, 11) == "tribe a");
+    assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample, 11) == NULL);
+    assert(electionAddTribe(sample, 11, "new tribe") == ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample, 11) == "new tribe");
+    return true;
+}
+/**
+ * sub tests for creating new map.
+ */
+
+bool subtestCreateNullMap(Election sample){
+    /**
+    Election sample = electionCreate();
+    AUG_MAP_FOREACH(key,sample.tribes){
+        assert(key == NULL);
+    }
+    AUG_MAP_FOREACH(key,sample.areas){
+        assert(key == NULL);
+    }
+    AUG_MAP_FOREACH(key,sample.votes_by_area){
+        assert(key == NULL);
+    }*/
     return true;
 }
 // END SUBTESTS
@@ -532,7 +551,10 @@ bool subGetTribeNameComperingStrings(Election sample){
  * possible.
  */
 
-void testCreate() { printf("Testing %s tests:\n", "'Create Map'"); }
+void testCreate() {
+    printf("Testing %s tests:\n", "'Create Map'");
+    TEST_WITH_SAMPLE(subtestCreateNullMap,"checkin if new election is empty");
+}
 
 void testAddTribe() {
     printf("Testing %s tests:\n", "'Add Tribe'");
@@ -601,8 +623,8 @@ void testSetTribeName() {
 }
 
 void testGetTribeName() {
-    TEST_WITH_SAMPLE(subGetTribeNameNullArgument,"inserting null arguments");
-    TEST_WITH_SAMPLE(subGetTribeNameComperingStrings,"compering strings");
+    TEST_WITH_SAMPLE(subGetTribeNameNullArgument, "inserting null arguments");
+    TEST_WITH_SAMPLE(subGetTribeNameComperingStrings, "compering strings");
 }
 
 void testDoomsDay() {
