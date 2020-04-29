@@ -412,6 +412,44 @@ bool subRemoveVotesNonExisting(Election sample) {
     assert(electionRemoveVote(sample, 24, 13, 3) == ELECTION_AREA_NOT_EXIST);
     return true;
 }
+
+/**
+ * sub tests for Getting tribe names.
+ */
+
+bool subSetTribeNameNULLArgument(Election sample) {
+    assert(electionSetTribeName(NULL, 11, "NULL ELECTION NAME") == ELECTION_NULL_ARGUMENT);
+    assert(electionSetTribeName(sample, 11, NULL) == ELECTION_NULL_ARGUMENT);
+    return true;
+}
+
+bool subSetTribeNameInvalidId(Election sample) {
+    assert(electionAddTribe(sample, 0, "tribe id zero") == ELECTION_SUCCESS);
+    assert(electionSetTribeName(sample, 0, "changing the name of a tribe id zero") == ELECTION_SUCCESS);
+    assert(electionSetTribeName(sample, -1, "changing the name of a NEGATIVE tribe id ") == ELECTION_INVALID_ID);
+    return true;
+}
+
+bool sudSetTribeNameTribeNotExits(Election sample) {
+    assert(electionSetTribeName(sample, 99, "tribe id not exists") == ELECTION_TRIBE_NOT_EXIST);
+    assert(electionRemoveTribe(sample,11)==ELECTION_SUCCESS);
+    assert(electionSetTribeName(sample,11,"not exists")==ELECTION_TRIBE_NOT_EXIST);
+    return true;
+}
+bool subSetTribeNameDifferentStrings(Election sample){
+    assert(electionSetTribeName(sample,12,"exclamation point!")== ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample,12,"{right bracket without space")== ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample,12,"` Grave accent with space")== ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample,12,"Grave` accent without space")== ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample,12,"{ right bracket with space")== ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample,12,"ALL UPPER CASE")== ELECTION_INVALID_NAME);
+    assert(electionGetTribeName(sample,12) != "ALL UPPER CASE");
+
+    assert(electionSetTribeName(sample,12,"normal string") == ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample,12)=="normal string");
+
+    return true;
+}
 // END SUBTESTS
 
 /**
@@ -481,7 +519,12 @@ void testRemoveVote() {
 
 void testComputeAreasToTribesMapping() {}
 
-void testSetTribeName() {}
+void testSetTribeName() {
+    TEST_WITH_SAMPLE(subSetTribeNameDifferentStrings,"trying to insert different strings");
+    TEST_WITH_SAMPLE(subSetTribeNameInvalidId,"inserting invalid id`s");
+    TEST_WITH_SAMPLE(subSetTribeNameNULLArgument,"inserting null arguments");
+    TEST_WITH_SAMPLE(sudSetTribeNameTribeNotExits,"trying to set name for not existing tribe");
+}
 
 void testGetTribeName() {}
 
