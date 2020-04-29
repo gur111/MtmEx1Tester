@@ -475,8 +475,9 @@ bool subRemoveVotesNonExisting(Election sample) {
 }
 
 /**
+ * sub tests for Getting tribe names.
  */
-
+ 
 bool subSetTribeNameNULLArgument(Election sample) {
     assert(electionSetTribeName(NULL, 11, "NULL ELECTION NAME") == ELECTION_NULL_ARGUMENT);
     assert(electionSetTribeName(sample, 11, NULL) == ELECTION_NULL_ARGUMENT);
