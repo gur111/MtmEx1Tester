@@ -430,8 +430,8 @@ bool subAddVotesInvalidId(Election sample) {
     assert(electionAddVote(sample, 11, 21, -1) == ELECTION_INVALID_VOTES);
     assert(electionAddVote(sample, 11, 21, 0) == ELECTION_INVALID_VOTES);
 
-    assert(electionAddVote(sample,21,11,8) == ELECTION_SUCCESS);
-    assert(electionAddVote(sample,21,11,INT_MAX) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 21, 11, 8) == ELECTION_SUCCESS);
+    assert(electionAddVote(sample, 21, 11, INT_MAX) == ELECTION_SUCCESS);
     return true;
 }
 
@@ -509,9 +509,8 @@ bool subSetTribeNameDifferentStrings(Election sample) {
     assert(electionSetTribeName(sample, 12, "{ right bracket with space") == ELECTION_INVALID_NAME);
     assert(electionSetTribeName(sample, 12, "ALL UPPER CASE") == ELECTION_INVALID_NAME);
     assert(electionGetTribeName(sample, 12) != "ALL UPPER CASE");
-
     assert(electionSetTribeName(sample, 12, "normal string") == ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample, 12) == "normal string");
+    assert(strcmp(electionGetTribeName(sample, 12), "normal string") == 0);
 
     return true;
 }
@@ -524,18 +523,18 @@ bool subGetTribeNameNullArgument(Election sample) {
 }
 
 bool subGetTribeNameComperingStrings(Election sample) {
-    assert(electionGetTribeName(sample, 11) == "tribe a");
+    assert(strcmp(electionGetTribeName(sample, 11), "tribe a") == 0);
     assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
     assert(electionGetTribeName(sample, 11) == NULL);
     assert(electionAddTribe(sample, 11, "new tribe") == ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample, 11) == "new tribe");
+    assert(strcmp(electionGetTribeName(sample, 11), "new tribe") == 0);
     return true;
 }
 /**
  * sub tests for creating new map.
  */
 
-bool subtestCreateNullMap(Election sample){
+bool subtestCreateNullMap(Election sample) {
     /**
     Election sample = electionCreate();
     AUG_MAP_FOREACH(key,sample.tribes){
@@ -559,7 +558,7 @@ bool subtestCreateNullMap(Election sample){
 
 void testCreate() {
     printf("Testing %s tests:\n", "'Create Map'");
-    TEST_WITH_SAMPLE(subtestCreateNullMap,"checkin if new election is empty");
+    TEST_WITH_SAMPLE(subtestCreateNullMap, "checkin if new election is empty");
 }
 
 void testAddTribe() {
