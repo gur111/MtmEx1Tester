@@ -465,7 +465,7 @@ bool subRemoveVotesNonExisting(Election sample) {
 }
 
 /**
- * sub tests for Getting tribe names.
+ * sub tests for Setting tribe names.
  */
 
 bool subSetTribeNameNULLArgument(Election sample) {
@@ -483,22 +483,38 @@ bool subSetTribeNameInvalidId(Election sample) {
 
 bool sudSetTribeNameTribeNotExits(Election sample) {
     assert(electionSetTribeName(sample, 99, "tribe id not exists") == ELECTION_TRIBE_NOT_EXIST);
-    assert(electionRemoveTribe(sample,11)==ELECTION_SUCCESS);
-    assert(electionSetTribeName(sample,11,"not exists")==ELECTION_TRIBE_NOT_EXIST);
+    assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
+    assert(electionSetTribeName(sample, 11, "not exists") == ELECTION_TRIBE_NOT_EXIST);
     return true;
 }
-bool subSetTribeNameDifferentStrings(Election sample){
-    assert(electionSetTribeName(sample,12,"exclamation point!")== ELECTION_INVALID_NAME);
-    assert(electionSetTribeName(sample,12,"{right bracket without space")== ELECTION_INVALID_NAME);
-    assert(electionSetTribeName(sample,12,"` Grave accent with space")== ELECTION_INVALID_NAME);
-    assert(electionSetTribeName(sample,12,"Grave` accent without space")== ELECTION_INVALID_NAME);
-    assert(electionSetTribeName(sample,12,"{ right bracket with space")== ELECTION_INVALID_NAME);
-    assert(electionSetTribeName(sample,12,"ALL UPPER CASE")== ELECTION_INVALID_NAME);
-    assert(electionGetTribeName(sample,12) != "ALL UPPER CASE");
 
-    assert(electionSetTribeName(sample,12,"normal string") == ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample,12)=="normal string");
+bool subSetTribeNameDifferentStrings(Election sample) {
+    assert(electionSetTribeName(sample, 12, "exclamation point!") == ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample, 12, "{right bracket without space") == ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample, 12, "` Grave accent with space") == ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample, 12, "Grave` accent without space") == ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample, 12, "{ right bracket with space") == ELECTION_INVALID_NAME);
+    assert(electionSetTribeName(sample, 12, "ALL UPPER CASE") == ELECTION_INVALID_NAME);
+    assert(electionGetTribeName(sample, 12) != "ALL UPPER CASE");
 
+    assert(electionSetTribeName(sample, 12, "normal string") == ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample, 12) == "normal string");
+
+    return true;
+}
+/**
+ * sub tests for Getting tribe names.
+ */
+bool subGetTribeNameNullArgument(Election sample) {
+    assert(electionGetTribeName(NULL, 11) == NULL);
+    return true;
+}
+bool subGetTribeNameComperingStrings(Election sample){
+    assert(electionGetTribeName(sample,11) == "tribe a");
+    assert(electionRemoveTribe(sample,11) == ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample,11) == NULL);
+    assert(electionAddTribe(sample,11,"new tribe")==ELECTION_SUCCESS);
+    assert(electionGetTribeName(sample,11) == "new tribe");
     return true;
 }
 // END SUBTESTS
@@ -570,13 +586,16 @@ void testRemoveVote() {
 void testComputeAreasToTribesMapping() {}
 
 void testSetTribeName() {
-    TEST_WITH_SAMPLE(subSetTribeNameDifferentStrings,"trying to insert different strings");
-    TEST_WITH_SAMPLE(subSetTribeNameInvalidId,"inserting invalid id`s");
-    TEST_WITH_SAMPLE(subSetTribeNameNULLArgument,"inserting null arguments");
-    TEST_WITH_SAMPLE(sudSetTribeNameTribeNotExits,"trying to set name for not existing tribe");
+    TEST_WITH_SAMPLE(subSetTribeNameDifferentStrings, "trying to insert different strings");
+    TEST_WITH_SAMPLE(subSetTribeNameInvalidId, "inserting invalid id`s");
+    TEST_WITH_SAMPLE(subSetTribeNameNULLArgument, "inserting null arguments");
+    TEST_WITH_SAMPLE(sudSetTribeNameTribeNotExits, "trying to set name for not existing tribe");
 }
 
-void testGetTribeName() {}
+void testGetTribeName() {
+    TEST_WITH_SAMPLE(subGetTribeNameNullArgument,"inserting null arguments");
+    TEST_WITH_SAMPLE(subGetTribeNameComperingStrings,"compering strings");
+}
 
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
