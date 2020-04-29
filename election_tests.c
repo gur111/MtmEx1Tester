@@ -5,8 +5,22 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #include "../election/election.h"
 #include "../mtm_map/map.h"
+#include "utils.h"
+// Allow malloc to be unstable
+#define malloc xmalloc
+
+#define STRESS_INVERTALS_MODIFIER 10000
+
+#ifdef __MACH__
+//#define WITH_FORK
+// Fuck Microsoft and all it stands for.
+// If you need to debug on this shitty OS, get the errors one by one.
+// Also, good luck. You'll need it
+#endif
+
 #include "../election/augmented_map.h"
 
 #ifdef __MACH__
@@ -57,13 +71,14 @@
 
 bool isEven(int num) { return num % 2 ? false : true; }
 
+// Problematic with id 0
 bool isCorrectArea(int area_id) {
     static int correct_area = -1;
     if (area_id < 0) {
         correct_area = area_id * (-1);
-        return true;
+        return true;  // Return value doesn't matter here
     } else {
-        assert(area_id >= 0);
+        assert(correct_area >= 0);
         return area_id == correct_area;
     }
 }
@@ -353,6 +368,7 @@ bool subRemoveAreaReAdd(Election sample) {
     ASSERT_TEST(electionAddArea(sample, 21, "re added") == ELECTION_SUCCESS);
     ASSERT_TEST(electionRemoveAreas(sample, specificArea(21)) ==
                 ELECTION_SUCCESS);
+    ASSERT_TEST(electionAddArea(sample, 21, "and again") == ELECTION_SUCCESS);
     return true;
 }
 /**
@@ -363,6 +379,42 @@ bool subAddVotesNullArgument(Election sample) {
     assert(electionAddVote(sample, 21, 11, 1) == ELECTION_SUCCESS);
     assert(electionRemoveVote(NULL, 22, 21, 1) == ELECTION_NULL_ARGUMENT);
     return true;
+}
+
+bool subStressAddRemoveRepeat(Election sample) {
+    bool status = true;
+    const int iterations = STRESS_INVERTALS_MODIFIER * 10;
+
+    for (int i = 0; i < iterations; i++) {
+        status = status && subRemoveTribeReadd(sample);
+    }
+    // TODO Add some votes. Can rely on computation test
+    for (int i = 0; i < iterations; i++) {
+        status = status && subRemoveAreaReadd(sample);
+        // TODO: Add some votes
+    }
+
+    return status;
+}
+
+bool subStressAddThenRemove(Election sample) {
+    bool status = true;
+    const int iterations = STRESS_INVERTALS_MODIFIER / 20;
+    for (int i = 0; i < iterations; i++) {
+        ASSERT_TEST(electionAddArea(sample, i + 100, randLowerString(7)) ==
+                    ELECTION_SUCCESS);
+        ASSERT_TEST(electionAddTribe(sample, i + 100, randLowerString(7)) ==
+                    ELECTION_SUCCESS);
+    }
+    // TODO Add some votes. Can rely on computation test
+    for (int i = 0; i < iterations; i++) {
+        ASSERT_TEST(electionRemoveAreas(sample, specificArea(i + 100)) ==
+                    ELECTION_SUCCESS);
+        ASSERT_TEST(electionRemoveTribe(sample, i + 100) == ELECTION_SUCCESS);
+        // TODO: Add some votes
+    }
+
+    return status;
 }
 
 bool subAddVotesInvalidId(Election sample) {
@@ -394,6 +446,7 @@ bool subAddVotesNotExits(Election sample) {
     assert(electionAddVote(sample, 25, 12, 5) == ELECTION_TRIBE_NOT_EXIST);
     return true;
 }
+
 /**
  * sub tests for removing  votes.
  */
@@ -561,7 +614,6 @@ void testRemoveVote() {
     TEST_WITH_SAMPLE(subRemoveVotesInvalidId, "Inserting Invalid Id");
     TEST_WITH_SAMPLE(subRemoveVotesNonExisting, "Non Existing tribes and areas");
 }
-
 void testComputeAreasToTribesMapping() {}
 
 void testSetTribeName() {
@@ -579,6 +631,9 @@ void testGetTribeName() {
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
+    printf("Testing %s tests:\n", "'Dooms` Day'");
+    TEST_WITH_SAMPLE(subStressAddRemoveRepeat, "Rapid Add and Remove");
+    TEST_WITH_SAMPLE(subStressAddThenRemove, "Fill Up Then Clear One By One");
 }
 
 void testDestroy() {}

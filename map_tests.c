@@ -5,6 +5,8 @@
 
 #include "../mtm_map/map.h"
 #include "test_utilities.h"
+#include "utils.h"
+
 bool testMapCreate() {
     printf("Testing mapCreate\n");
     Map map1 = mapCreate();
@@ -242,30 +244,6 @@ bool testMapRemove() {
     return true;
 }
 
-char *randString(int length) {
-    char *string =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
-    size_t string_len = strlen(string);
-    char *random_string = NULL;
-
-    if (length < 1) {
-        length = 1;
-    }
-    random_string = malloc(sizeof(char) * (length + 1));
-    if (random_string == NULL) {
-        return NULL;
-    }
-    short key = 0;
-    for (int n = 0; n < length; n++) {
-        key = rand() % string_len;
-        random_string[n] = string[key];
-    }
-
-    random_string[length] = '\0';
-
-    return random_string;
-}
-
 bool doomsDay() {
     Map map = mapCreate();
     const int repeat = 10000;
@@ -291,13 +269,14 @@ bool doomsDay() {
 
 int main(int argc, char *argv[]) {
     printf("Start Map Tests\n");
-    testMapPutGet();
-    testMapCopy();
-    testMapGetSize();
-    testMapCreate();
-    testMapContains();
-    testMapRemove();
-    doomsDay();
+    bool status = true;
+    status = status && testMapPutGet();
+    status = status && testMapCopy();
+    status = status && testMapGetSize();
+    status = status && testMapCreate();
+    status = status && testMapContains();
+    status = status && testMapRemove();
+    status = status && doomsDay();
     printf("end Map Tests\n");
-    return 0;
+    return status ? 0 : 1;
 }
