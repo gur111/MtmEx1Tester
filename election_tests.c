@@ -243,6 +243,13 @@ bool subRemoveTribeWithVotes(Election sample) {
     return true;
 }
 
+bool subRemoveTribeFirstMiddelLast(Election sample){
+    assert(electionRemoveTribe(sample,11) ==ELECTION_SUCCESS);
+    assert(electionRemoveTribe(sample,15) ==ELECTION_SUCCESS);
+    assert(electionRemoveTribe(sample,13) ==ELECTION_SUCCESS);
+    return true;
+}
+
 /**
  * This test makes sure the string sent to tribe as name is copied and not
  * merely the same instance is used
@@ -547,6 +554,7 @@ void testRemoveTribe() {
     TEST_WITH_SAMPLE(subRemoveTribeInvalidId, "Inserting Invalid Id");
     TEST_WITH_SAMPLE(subRemoveTribeNotExist, "Removing a non existing tribe");
     TEST_WITH_SAMPLE(subRemoveTribeWithVotes, "adding votes");
+    TEST_WITH_SAMPLE(subRemoveTribeFirstMiddelLast, "removing from the top, bottom, middle list");
 }
 
 void testAddArea() {
