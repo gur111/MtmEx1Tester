@@ -475,7 +475,6 @@ bool subRemoveVotesNonExisting(Election sample) {
 }
 
 /**
- * sub tests for Setting tribe names.
  */
 
 bool subSetTribeNameNULLArgument(Election sample) {
@@ -505,7 +504,7 @@ bool subSetTribeNameDifferentStrings(Election sample) {
     assert(electionSetTribeName(sample, 12, "Grave` accent without space") == ELECTION_INVALID_NAME);
     assert(electionSetTribeName(sample, 12, "{ right bracket with space") == ELECTION_INVALID_NAME);
     assert(electionSetTribeName(sample, 12, "ALL UPPER CASE") == ELECTION_INVALID_NAME);
-    assert(electionGetTribeName(sample, 12) != "ALL UPPER CASE");
+    assert(strcmp(electionGetTribeName(sample, 12), "ALL UPPER CASE") != 0);
     assert(electionSetTribeName(sample, 12, "normal string") == ELECTION_SUCCESS);
     assert(strcmp(electionGetTribeName(sample, 12), "normal string") == 0);
 
