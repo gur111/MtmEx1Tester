@@ -268,6 +268,7 @@ bool doomsDay() {
 }
 
 bool testMapForEach() {
+    printf("start testMapForEach \n");
     Map map = mapCreate();
     mapPut(map, "key 1", "value 1");
     mapPut(map, "key 2", "value 2");
@@ -299,6 +300,13 @@ bool testMapForEach() {
         something_happened = true;
     }
     ASSERT_TEST(something_happened == false);
+    MAP_FOREACH(key,map){
+        mapPut(map_2,key,mapGet(map,key));
+    }
+    ASSERT_TEST(mapGetSize(map_2) == mapGetSize(map));
+    MAP_FOREACH(key,map_2){
+        ASSERT_TEST(mapGet(map,key)!=NULL);
+    }
 
     return true;
 }
