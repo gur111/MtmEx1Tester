@@ -389,7 +389,7 @@ bool subStressAddRemoveRepeat(Election sample) {
     }
     // TODO Add some votes. Can rely on computation test
     for (int i = 0; i < iterations; i++) {
-        status = status && subRemoveAreaReadd(sample);
+        status = status && subRemoveAreaReAdd(sample);
         // TODO: Add some votes
     }
 
