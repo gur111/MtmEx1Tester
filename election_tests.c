@@ -204,7 +204,14 @@ bool subAddTribeExtremeIdValues(Election sample) {
     ASSERT_TEST(electionGetTribeName(sample, INT_MIN) == NULL);
     return true;
 }
+bool subAddTribeOrderOfReturn(Election sample){
+    ASSERT_TEST(electionAddTribe(NULL,-1,"FSFS!!") == ELECTION_NULL_ARGUMENT);
+    ASSERT_TEST(electionAddTribe(sample,-1,"FSFS!!") == ELECTION_INVALID_ID);
+    ASSERT_TEST(electionAddTribe(NULL,11,"FSFS!!") == ELECTION_TRIBE_ALREADY_EXIST);
+    ASSERT_TEST(electionAddTribe(NULL,99,"FSFS!!") == ELECTION_INVALID_NAME);
+    return true;
 
+}
 // Test removing and readding tribe
 /**
  * sub tests for removing tribes.
@@ -358,6 +365,12 @@ bool subAddAreaExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddArea(sample, INT_MIN, "min int") ==
                 ELECTION_INVALID_ID);
     // ASSERT_TEST(electionGetAreaName(sample, INT_MIN) == NULL);
+    return true;
+}
+bool subAddAreaOrderOfError(Election sample){
+    ASSERT_TEST(electionAddArea(NULL,-1,"!!!!!")== ELECTION_NULL_ARGUMENT);
+    ASSERT_TEST(electionAddArea(sample,-1,"!!")==ELECTION_INVALID_ID);
+    ASSERT_TEST(electionAddArea(sample,11,"!!!")==ELECTION_AREA_ALREADY_EXIST);
     return true;
 }
 
@@ -571,6 +584,7 @@ void testAddTribe() {
                      "Dereferencing String Tribe Name");
     TEST_WITH_SAMPLE(subAddTribeExtremeIdValues,
                      "Verify Tribe Extreme Id Values");
+    TEST_WITH_SAMPLE(subAddTribeOrderOfReturn,"checking order of errors");
 }
 
 void testRemoveTribe() {
@@ -595,6 +609,7 @@ void testAddArea() {
     //                  "Dereferencing String Area Name");
     TEST_WITH_SAMPLE(subAddAreaExtremeIdValues,
                      "Verify Area Extreme Id Values");
+    TEST_WITH_SAMPLE(subAddAreaOrderOfError,"checking order of errors");
 }
 
 void testRemoveArea() {
