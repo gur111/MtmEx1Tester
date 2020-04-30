@@ -390,7 +390,7 @@ bool subStressAddRemoveRepeat(Election sample) {
     }
     // TODO Add some votes. Can rely on computation test
     for (int i = 0; i < iterations; i++) {
-        status = status && subRemoveAreaReadd(sample);
+        status = status && subRemoveAreaReAdd(sample);
         // TODO: Add some votes
     }
 
@@ -507,7 +507,7 @@ bool subSetTribeNameDifferentStrings(Election sample) {
     assert(electionSetTribeName(sample, 12, "Grave` accent without space") == ELECTION_INVALID_NAME);
     assert(electionSetTribeName(sample, 12, "{ right bracket with space") == ELECTION_INVALID_NAME);
     assert(electionSetTribeName(sample, 12, "ALL UPPER CASE") == ELECTION_INVALID_NAME);
-    assert(electionGetTribeName(sample, 12) != "ALL UPPER CASE");
+    assert(strcmp(electionGetTribeName(sample, 12), "ALL UPPER CASE") != 0);
     assert(electionSetTribeName(sample, 12, "normal string") == ELECTION_SUCCESS);
     assert(strcmp(electionGetTribeName(sample, 12), "normal string") == 0);
 
@@ -614,6 +614,7 @@ void testRemoveVote() {
     TEST_WITH_SAMPLE(subRemoveVotesInvalidId, "Inserting Invalid Id");
     TEST_WITH_SAMPLE(subRemoveVotesNonExisting, "Non Existing tribes and areas");
 }
+
 void testComputeAreasToTribesMapping() {}
 
 void testSetTribeName() {
