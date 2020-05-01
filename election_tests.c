@@ -370,15 +370,17 @@ bool subStressAddThenRemove(Election sample) {
  */
 bool subMallErrElectionCreate(Election sample) {
     Election elect = NULL;
+    bool has_failed = false;
     xmalloc(-1);
     for (int i = 1;
          i < MAX_MALLOC_PER_FUNCTION && (elect = electionCreate()) == NULL;
          i++) {
         xmalloc(-(i + 1));
+        has_failed = true;
     }
 
     xmalloc(0);
-    if(elect == NULL){
+    if (!has_failed) {
         fprintf(stderr, "electionCreate didn't fail even once");
         return false;
     }
