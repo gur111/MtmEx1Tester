@@ -14,6 +14,7 @@
 #define malloc xmalloc
 
 #define STRESS_INVERTALS_MODIFIER 100
+#define MAX_MALLOC_PER_FUNCTION 100
 
 #ifdef __unix__
 //#define WITH_FORK
@@ -363,6 +364,29 @@ bool subStressAddThenRemove(Election sample) {
 
     return status;
 }
+
+/**
+ * Malloc Failures Sub tests
+ */
+bool subMallErrElectionCreate(Election sample) {
+    Election elect = NULL;
+    xmalloc(-1);
+    for (int i = 1;
+         i < MAX_MALLOC_PER_FUNCTION && (elect = electionCreate()) == NULL;
+         i++) {
+        xmalloc(-(i + 1));
+    }
+
+    xmalloc(0);
+    if(elect == NULL){
+        fprintf(stderr, "electionCreate didn't fail even once");
+        return false;
+    }
+    electionDestroy(elect);
+
+    return true;
+}
+
 // END SUBTESTS
 
 /**
@@ -411,6 +435,10 @@ void testRemoveVote() {}
 void testComputeAreasToTribesMapping() {}
 void testSetTribeName() {}
 void testGetTribeName() {}
+void testMallocFailures() {
+    printf("Testing %s tests:\n", "'Malloc Failures Data Integrity'");
+    TEST_WITH_SAMPLE(subMallErrElectionCreate, "Create Election");
+}
 void testDoomsDay() {
     // TODO: Stress Election with lots of adds and removes for both tribes and
     // areas
@@ -432,6 +460,7 @@ void (*tests[])(void) = {testCreate,
                          testSetTribeName,
                          testGetTribeName,
                          testComputeAreasToTribesMapping,
+                         testMallocFailures,
                          testDestroy,
                          testDoomsDay,
                          NULL};
