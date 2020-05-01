@@ -205,9 +205,9 @@ bool subAddTribeExtremeIdValues(Election sample) {
 bool subAddTribeOrderOfReturn(Election sample) {
     ASSERT_TEST(electionAddTribe(NULL, -1, "FSFS!!") == ELECTION_NULL_ARGUMENT);
     ASSERT_TEST(electionAddTribe(sample, -1, "FSFS!!") == ELECTION_INVALID_ID);
-    ASSERT_TEST(electionAddTribe(NULL, 11, "FSFS!!") ==
+    ASSERT_TEST(electionAddTribe(sample, 11, "FSFS!!") ==
                 ELECTION_TRIBE_ALREADY_EXIST);
-    ASSERT_TEST(electionAddTribe(NULL, 99, "FSFS!!") == ELECTION_INVALID_NAME);
+    ASSERT_TEST(electionAddTribe(sample, 99, "FSFS!!") == ELECTION_INVALID_NAME);
     return true;
 }
 // Test removing and readding tribe
@@ -369,7 +369,7 @@ bool subAddAreaExtremeIdValues(Election sample) {
 bool subAddAreaOrderOfError(Election sample) {
     ASSERT_TEST(electionAddArea(NULL, -1, "!!!!!") == ELECTION_NULL_ARGUMENT);
     ASSERT_TEST(electionAddArea(sample, -1, "!!") == ELECTION_INVALID_ID);
-    ASSERT_TEST(electionAddArea(sample, 11, "!!!") ==
+    ASSERT_TEST(electionAddArea(sample, 21, "!!!") ==
                 ELECTION_AREA_ALREADY_EXIST);
     return true;
 }
