@@ -6,23 +6,17 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../election/election.h"
-#include "../mtm_map/map.h"
+#include "../wetPart/elections/election.h"
+#include "../wetPart/elections/mtm_map/map.h"
 #include "utils.h"
+
 // Allow malloc to be unstable
 #define malloc xmalloc
 
-#define STRESS_INVERTALS_MODIFIER 10000
+#define STRESS_INVERTALS_MODIFIER 100
 
 #ifdef __unix__
-#define WITH_FORK
-// Fuck Microsoft and all it stands for.
-// If you need to debug on this shitty OS, get the errors one by one.
-// Also, good luck. You'll need it
-#endif
-
-#ifdef __unix__
-#define WITH_FORK
+//#define WITH_FORK
 // Fuck Microsoft and all it stands for.
 // If you need to debug on this shitty OS, get the errors one by one.
 // Also, good luck. You'll need it
