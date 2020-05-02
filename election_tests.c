@@ -469,18 +469,19 @@ bool subAddVotesNotExits(Election sample) {
     assert(electionAddVote(sample, 25, 12, 5) == ELECTION_TRIBE_NOT_EXIST);
     return true;
 }
+
 bool subAddVotesErrorPrecedence(Election sample) {
-    assert(electionAddVote(NULL,-1,-1,-1) == ELECTION_NULL_ARGUMENT);
-    assert(electionAddVote(NULL,99,99,-1) == ELECTION_NULL_ARGUMENT);
+    assert(electionAddVote(NULL, -1, -1, -1) == ELECTION_NULL_ARGUMENT);
+    assert(electionAddVote(NULL, 99, 99, -1) == ELECTION_NULL_ARGUMENT);
 
-    assert(electionAddVote(sample,-1,11,-1) == ELECTION_INVALID_ID);
-    assert(electionAddVote(sample,21,-1,-1) == ELECTION_INVALID_ID);
-    assert(electionAddVote(sample,-1,99,-1) == ELECTION_INVALID_ID);
-    assert(electionAddVote(sample,99,-1,-1) == ELECTION_INVALID_ID);
+    assert(electionAddVote(sample, -1, 11, -1) == ELECTION_INVALID_ID);
+    assert(electionAddVote(sample, 21, -1, -1) == ELECTION_INVALID_ID);
+    assert(electionAddVote(sample, -1, 99, -1) == ELECTION_INVALID_ID);
+    assert(electionAddVote(sample, 99, -1, -1) == ELECTION_INVALID_ID);
 
-    assert(electionAddVote(sample,99,99,-1) == ELECTION_INVALID_VOTES);
-    assert(electionAddVote(sample, 99, 99 ,3) == ELECTION_AREA_NOT_EXIST);
-    assert(electionAddVote(sample,21,99,3) == ELECTION_TRIBE_NOT_EXIST);
+    assert(electionAddVote(sample, 99, 99, -1) == ELECTION_INVALID_VOTES);
+    assert(electionAddVote(sample, 99, 99, 3) == ELECTION_AREA_NOT_EXIST);
+    assert(electionAddVote(sample, 21, 99, 3) == ELECTION_TRIBE_NOT_EXIST);
 
     return true;
 }
@@ -673,7 +674,7 @@ void testAddVote() {
     TEST_WITH_SAMPLE(subAddVotesInvalidId, "Inserting Invalid Id");
     TEST_WITH_SAMPLE(subAddVotesNotExits,
                      "Inserting non existing areas and tribes");
-    TEST_WITH_SAMPLE(subAddVotesErrorPrecedence,"checking order of errors");
+    TEST_WITH_SAMPLE(subAddVotesErrorPrecedence, "checking order of errors");
 }
 
 void testRemoveVote() {
