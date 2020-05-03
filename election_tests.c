@@ -384,6 +384,7 @@ bool subMallErrElectionCreate(Election sample) {
         fprintf(stderr, "electionCreate didn't fail even once");
         return false;
     }
+    // TODO: Check no tribes no vote no nothing. I think the only way is computeAreasToTribes
     electionDestroy(elect);
 
     return true;
