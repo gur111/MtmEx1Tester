@@ -2,9 +2,8 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <stdlib.h>
+
 
 #include "../election/election.h"
 #include "utils.h"
@@ -15,13 +14,19 @@
 
 #ifdef __unix__
 #define WITH_FORK
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 // Fuck Microsoft and all it stands for.
 // If you need to debug on this shitty OS, get the errors one by one.
 // Also, good luck. You'll need it
 #endif
 
 #ifdef __MACH__
-//#define WITH_FORK
+#define WITH_FORK
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 // Fuck Microsoft and all it stands for.
 // If you need to debug on this shitty OS, get the errors one by one.
 // Also, good luck. You'll need it
