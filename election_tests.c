@@ -654,7 +654,7 @@ bool subGetTribeNameComperingStrings(Election sample) {
  * Sub tests for creating new map.
  */
 
-bool subtestCreateNullMap(Election sample) {
+bool subtestCreateEmptyElection(Election sample) {
     Election empty_election = electionCreate();
     Map results = electionComputeAreasToTribesMapping(empty_election);
     ASSERT_TEST(mapGetSize(results) == 0);
@@ -672,7 +672,7 @@ bool subtestCreateNullMap(Election sample) {
 
 void testCreate() {
     printf("Testing %s tests:\n", "'Create Map'");
-    TEST_WITH_SAMPLE(subtestCreateNullMap, "Empty Election System");
+    TEST_WITH_SAMPLE(subtestCreateEmptyElection, "Empty Election System");
 }
 
 void testAddTribe() {
