@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #include "../election/election.h"
-#include "../mtm_map/map.h"
 #include "utils.h"
 // Allow malloc to be unstable
 #define malloc xmalloc
@@ -119,7 +118,9 @@ bool subAddTribeInvalidId(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, -1, "invalid tribe id") ==
                 ELECTION_INVALID_ID);
     // Verify it wasn't added
-    ASSERT_TEST(electionGetTribeName(sample, -1) == NULL);
+    char *res = electionGetTribeName(sample, -1);
+    ASSERT_TEST(res == NULL);
+    free(res);
     return true;
 }
 
@@ -128,24 +129,29 @@ bool subAddTribeExist(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, 11, "already exist") ==
                 ELECTION_TRIBE_ALREADY_EXIST);
     // Existing Name
-    ASSERT_TEST(electionAddTribe(sample, 1, electionGetTribeName(sample, 11)) ==
+    char *tribe_name = electionGetTribeName(sample, 11);
+    ASSERT_TEST(electionAddTribe(sample, 1, tribe_name) ==
                 ELECTION_SUCCESS);
     // Make sure names match
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1),
-                       electionGetTribeName(sample, 11)) == 0);
+    tribe_name = electionGetTribeName(sample, 1);
+    char *tribe_name_2 = electionGetTribeName(sample, 11);
+    ASSERT_TEST(strcmp(tribe_name, tribe_name_2) == 0);
     // Make sure the names are different instances
-    ASSERT_TEST(electionGetTribeName(sample, 1) !=
-                electionGetTribeName(sample, 11));
-
+    tribe_name = electionGetTribeName(sample, 1);
+    tribe_name_2 = electionGetTribeName(sample, 11);
+    ASSERT_TEST(tribe_name != tribe_name_2);
+    free(tribe_name);
+    free(tribe_name_2);
     return true;
 }
 
 bool subAddTribeLongName(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, 1, SUPER_LONG_STRING) ==
                 ELECTION_SUCCESS);
-    ASSERT_TEST(electionGetTribeName(sample, 1) != NULL);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), SUPER_LONG_STRING) ==
-                0);
+    char *tribe_name = electionGetTribeName(sample, 1);
+    ASSERT_TEST(tribe_name != NULL);
+    ASSERT_TEST(strcmp(tribe_name, SUPER_LONG_STRING) == 0);
+    free(tribe_name);
     return true;
 }
 
@@ -180,13 +186,17 @@ bool subAddTribeValidName(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, 1, "names with spaces") ==
                 ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 2, "nospaces") == ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 2), "nospaces") == 0);
+    char *tribe_name = electionGetTribeName(sample, 2);
+    ASSERT_TEST(strcmp(tribe_name, "nospaces") == 0);
     // Check empty string
     ASSERT_TEST(electionAddTribe(sample, 3, "") == ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 3), "") == 0);
+    tribe_name = electionGetTribeName(sample, 3);
+    ASSERT_TEST(strcmp(tribe_name, "") == 0);
     // String with only space
     ASSERT_TEST(electionAddTribe(sample, 4, " ") == ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 4), " ") == 0);
+    tribe_name = electionGetTribeName(sample, 4);
+    ASSERT_TEST(strcmp(tribe_name, " ") == 0);
+    free(tribe_name);
     return true;
 }
 
@@ -194,14 +204,18 @@ bool subAddTribeValidName(Election sample) {
 bool subAddTribeExtremeIdValues(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, INT_MAX, "max int") ==
                 ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, INT_MAX), "max int") == 0);
+    char *tribe_name = electionGetTribeName(sample, INT_MAX);
+    ASSERT_TEST(strcmp(tribe_name, "max int") == 0);
 
     ASSERT_TEST(electionAddTribe(sample, 0, "zero id") == ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 0), "zero id") == 0);
+    tribe_name = electionGetTribeName(sample, 0);
+    ASSERT_TEST(strcmp(tribe_name, "zero id") == 0);
 
     ASSERT_TEST(electionAddTribe(sample, INT_MIN, "min int") ==
                 ELECTION_INVALID_ID);
-    ASSERT_TEST(electionGetTribeName(sample, INT_MIN) == NULL);
+    tribe_name = electionGetTribeName(sample, INT_MIN);
+    ASSERT_TEST(tribe_name == NULL);
+    free(tribe_name);
     return true;
 }
 
@@ -220,9 +234,11 @@ bool subAddTribeErrorPrecedence(Election sample) {
 bool subRemoveTribeReadd(Election sample) {
     ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 11, "re added") == ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 11), "re added") == 0);
+    char *tribe_name = electionGetTribeName(sample, 11);
+    ASSERT_TEST(strcmp(tribe_name, "re added") == 0);
     ASSERT_TEST(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 11, "and again") == ELECTION_SUCCESS);
+    free (tribe_name);
     return true;
 }
 
@@ -241,8 +257,10 @@ bool subRemoveTribeInvalidId(Election sample) {
 bool subRemoveTribeNotExist(Election sample) {
     assert(electionRemoveTribe(sample, 1) == ELECTION_TRIBE_NOT_EXIST);
     assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample, 11) == NULL);
+    char *tribe_name = electionGetTribeName(sample, 11);
+    assert(tribe_name == NULL);
     assert(electionRemoveTribe(sample, 11) == ELECTION_TRIBE_NOT_EXIST);
+    free(tribe_name);
     return true;
 }
 
@@ -274,11 +292,12 @@ bool subRemoveTribeErrorPrecedence(Election sample) {
 bool subAddTribeVerifyStringsDereferencing(Election sample) {
     char name[] = "some name";
     ASSERT_TEST(electionAddTribe(sample, 1, name) == ELECTION_SUCCESS);
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), name) == 0);
+    char *tribe_name = electionGetTribeName(sample, 1);
+    ASSERT_TEST(strcmp(tribe_name, name) == 0);
     name[0] = 'a';
-    ASSERT_TEST(strcmp(electionGetTribeName(sample, 1), name) != 0);
-    ASSERT_TEST(electionGetTribeName(sample, 1) != name);
-
+    ASSERT_TEST(strcmp(tribe_name, name) != 0);
+    ASSERT_TEST(tribe_name != name);
+    free(tribe_name);
     return true;
 }
 
@@ -559,11 +578,13 @@ bool subSetTribeNameDifferentStrings(Election sample) {
            ELECTION_INVALID_NAME);
     assert(electionSetTribeName(sample, 12, "ALL UPPER CASE") ==
            ELECTION_INVALID_NAME);
-    assert(strcmp(electionGetTribeName(sample, 12), "ALL UPPER CASE") != 0);
+    char *tribe_name = electionGetTribeName(sample, 12);
+    assert(strcmp(tribe_name, "ALL UPPER CASE") != 0);
     assert(electionSetTribeName(sample, 12, "normal string") ==
            ELECTION_SUCCESS);
-    assert(strcmp(electionGetTribeName(sample, 12), "normal string") == 0);
-
+    tribe_name = electionGetTribeName(sample, 12);
+    assert(strcmp(tribe_name, "normal string") == 0);
+    free(tribe_name);
     return true;
 }
 
@@ -578,16 +599,22 @@ bool subSetTribeNameErrorPrecedence(Election sample) {
  * sub tests for Getting tribe names.
  */
 bool subGetTribeNameNullArgument(Election sample) {
-    assert(electionGetTribeName(NULL, 11) == NULL);
+    char *tribe_name = electionGetTribeName(NULL, 11);
+    assert(tribe_name == NULL);
+    free(tribe_name);
     return true;
 }
 
 bool subGetTribeNameComperingStrings(Election sample) {
-    assert(strcmp(electionGetTribeName(sample, 11), "tribe a") == 0);
+    char *tribe_name = electionGetTribeName(sample, 11);
+    assert(strcmp(tribe_name, "tribe a") == 0);
     assert(electionRemoveTribe(sample, 11) == ELECTION_SUCCESS);
-    assert(electionGetTribeName(sample, 11) == NULL);
+    tribe_name = electionGetTribeName(sample, 11);
+    assert(tribe_name == NULL);
     assert(electionAddTribe(sample, 11, "new tribe") == ELECTION_SUCCESS);
-    assert(strcmp(electionGetTribeName(sample, 11), "new tribe") == 0);
+    tribe_name = electionGetTribeName(sample, 11);
+    assert(strcmp(tribe_name, "new tribe") == 0);
+    free(tribe_name);
     return true;
 }
 /**
