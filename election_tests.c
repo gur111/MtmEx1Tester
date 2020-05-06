@@ -809,8 +809,7 @@ int main(int argc, char *argv[]) {
             // We're in the parrent process
             if (waitpid(pid, &exit_code, 0) != pid) {
                 exit_code = -1;
-            }
-            if (exit_code != 0) {
+            } if (exit_code != 0) {
                 g_status = false;
             }
         }
