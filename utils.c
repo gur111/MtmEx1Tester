@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #define MALLOC_FAIL_CHANCE 10
 
@@ -53,7 +54,7 @@ char *randLowerString(int length) {
     return random_string;
 }
 
-void *xmalloc(size_t size) {
+void *xmalloc(long size) {
     // The function will fail on the `fail_after`th malloc.
     // Zero mean never simulate failure
     static int fail_after = 0;
@@ -63,7 +64,7 @@ void *xmalloc(size_t size) {
     }
 
     if (fail_after == 1) {
-        printf("Out of memory simulated\n");
+        fprintf(stderr, "Out of memory simulated\n");
         fail_after = 0;
         return NULL;
     }

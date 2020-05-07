@@ -1,8 +1,6 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include <stdlib.h>
-
 char *randString(int length);
 char *randLowerString(int length);
 
@@ -17,5 +15,5 @@ char *randLowerString(int length);
  * By default it will not fail and will act exactly like
  * malloc acts.
  */
-void *xmalloc(size_t size);
+void *xmalloc(long size);
 #endif
