@@ -16,4 +16,6 @@ char *randLowerString(int length);
  * malloc acts.
  */
 void *xmalloc(long size);
+
+char *intToStr(int num);
 #endif
