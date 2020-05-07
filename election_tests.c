@@ -857,7 +857,7 @@ bool subStressAddThenRemove(Election sample) {
     ASSERT_TEST(mapGetSize(results) == (6 + iterations));
     char *cur_ind;
     for (int i = 0; i < iterations; i++) {
-        cur_ind = intToStr(i + 100);
+        cur_ind = tester_intToStr(i + 100);
         ASSERT_TEST(strcmp(mapGet(results, cur_ind), cur_ind) == 0);
         free(cur_ind);
     }

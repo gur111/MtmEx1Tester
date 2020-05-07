@@ -17,5 +17,5 @@ char *randLowerString(int length);
  */
 void *xmalloc(long size);
 
-char *intToStr(int num);
+char *tester_intToStr(int num);
 #endif
