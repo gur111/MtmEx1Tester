@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../wetPart/elections/election.h"
+#include "../Submission/election.h"
 #include "../wetPart/elections/mtm_map/map.h"
 #include "utils.h"
 
