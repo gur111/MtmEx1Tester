@@ -477,12 +477,15 @@ bool subStressAddRemoveRepeat(Election sample) {
 
 bool subStressAddThenRemove(Election sample) {
     bool status = true;
+    char *str;
     const int iterations = STRESS_INVERTALS_MODIFIER / 20;
     for (int i = 0; i < iterations; i++) {
-        ASSERT_TEST(electionAddArea(sample, i + 100, randLowerString(7)) ==
-                    ELECTION_SUCCESS);
-        ASSERT_TEST(electionAddTribe(sample, i + 100, randLowerString(7)) ==
-                    ELECTION_SUCCESS);
+        str = randLowerString(7);
+        ASSERT_TEST(electionAddArea(sample, i + 100, str) == ELECTION_SUCCESS);
+        free(str);
+        str = randLowerString(7);
+        ASSERT_TEST(electionAddTribe(sample, i + 100, str) == ELECTION_SUCCESS);
+        free(str);
     }
     // TODO Add some votes. Can rely on computation test
     for (int i = 0; i < iterations; i++) {
@@ -714,17 +717,18 @@ bool subtestCreateEmptyElection(Election sample) {
     Map results = electionComputeAreasToTribesMapping(empty_election);
     ASSERT_TEST(mapGetSize(results) == 0);
     ASSERT_TEST(mapGetFirst(results) == NULL);
+    electionDestroy(empty_election);
+    mapDestroy(results);
     return true;
 }
-
 
 /**
  * Sub tests for computing votes to areas
  */
 bool subComputePrecedence(Election sample) {
-    electionAddVote(sample, 21, 12, 10);
-    electionAddVote(sample, 21, 11, 10);
-    electionAddVote(sample, 21, 13, 10);
+    electionAddVote(sample, 21, 12, 101);
+    electionAddVote(sample, 21, 11, 101);
+    electionAddVote(sample, 21, 13, 101);
     Map results = electionComputeAreasToTribesMapping(sample);
     ASSERT_TEST(results);
     ASSERT_TEST(strcmp(mapGet(results, "21"), "11") == 0);
@@ -893,7 +897,8 @@ void testRemoveVote() {
     TEST_WITH_SAMPLE(subRemoveVotesInvalidId, "Inserting Invalid Id");
     TEST_WITH_SAMPLE(subRemoveVotesNonExisting, "Non Existing Tribes Or Areas");
     TEST_WITH_SAMPLE(subRemoveVotesNegative, "Remove Negative Votes");
-    TEST_WITH_SAMPLE(subRemoveVotesMinIsZero, "Remove More Votes Than Tribe Has");
+    TEST_WITH_SAMPLE(subRemoveVotesMinIsZero,
+                     "Remove More Votes Than Tribe Has");
 }
 
 void testComputeAreasToTribesMapping() {
