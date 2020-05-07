@@ -12,7 +12,7 @@
 #define STRESS_INVERTALS_MODIFIER 10000
 
 #ifdef __unix__
-// #define WITH_FORK
+#define WITH_FORK
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
