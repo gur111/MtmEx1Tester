@@ -471,7 +471,6 @@ bool subAddVotesInvalidId(Election sample) {
     ASSERT_TEST(electionAddVote(sample, 11, 21, 0) == ELECTION_INVALID_VOTES);
 
     ASSERT_TEST(electionAddVote(sample, 21, 11, 8) == ELECTION_SUCCESS);
-    ASSERT_TEST(electionAddVote(sample, 21, 11, INT_MAX) == ELECTION_SUCCESS);
     return true;
 }
 
