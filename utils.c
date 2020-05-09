@@ -74,3 +74,10 @@ void *xmalloc(long size) {
     assert(fail_after >= 0);
     return (malloc(size));
 }
+
+char *tester_intToStr(int num) {
+    char *res = malloc(30);
+    assert(res != NULL);
+    sprintf(res, "%d", num);
+    return res;
+}
