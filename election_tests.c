@@ -1006,6 +1006,12 @@ void (*tests[])(void) = {testCreate,
                          NULL};
 
 int main(int argc, char *argv[]) {
+#ifdef NDEBUG
+    fprintf(stderr,
+            "Fatal error: You seemed to compile with '-DNDEBUG'."
+            "\nPlease never compile with -DNDEBUG when running tests!!!\n");
+    return 1;
+#endif
 #ifdef WITH_FORK
     pid_t pid;
     int exit_code;
