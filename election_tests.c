@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../election/election.h"
+#include "../election.h"
 #include "utils.h"
 // Allow malloc to be unstable
 #define malloc xmalloc
