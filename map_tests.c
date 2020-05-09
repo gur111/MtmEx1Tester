@@ -307,7 +307,9 @@ bool testMapForEach() {
     MAP_FOREACH(key,map_2){
         ASSERT_TEST(mapGet(map,key)!=NULL);
     }
-
+    
+    mapDestroy(map);
+    mapDestroy(map_2);
     return true;
 }
 
