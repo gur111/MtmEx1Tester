@@ -4,15 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../election.h"
+#include "../Submission//election.h"
 #include "utils.h"
 // Allow malloc to be unstable
 #define malloc xmalloc
 
-#define STRESS_INVERTALS_MODIFIER 10000
+#define STRESS_INVERTALS_MODIFIER 1000
 
 #ifdef __unix__
-#define WITH_FORK
+//#define WITH_FORK
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -329,7 +329,7 @@ bool subAddAreaInvalidId(Election sample) {
 }
 
 bool subAddAreaExist(Election sample) {
-    electionAddVote(sample, 21, 12, 10);
+    ASSERT_TEST(electionAddVote(sample, 21, 12, 10) == ELECTION_SUCCESS);
     Map results = electionComputeAreasToTribesMapping(sample);
     ASSERT_TEST(strcmp(mapGet(results, "21"), "12") == 0);
     ASSERT_TEST(mapGetSize(results) == 6);
@@ -1038,7 +1038,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (g_status) {
-        printf("All tests finishes successfully\n");
+        printf("All tests have been finished successfully\n");
         return 0;
     } else {
         fprintf(stderr,
