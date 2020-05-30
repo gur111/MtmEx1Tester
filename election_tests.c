@@ -467,8 +467,8 @@ bool subAddVotesInvalidId(Election sample) {
     ASSERT_TEST(electionAddTribe(sample, 0, "zero tribe") == ELECTION_SUCCESS);
     ASSERT_TEST(electionAddVote(sample, 21, 0, 3) == ELECTION_SUCCESS);
 
-    ASSERT_TEST(electionAddVote(sample, 11, 21, -1) == ELECTION_INVALID_VOTES);
-    ASSERT_TEST(electionAddVote(sample, 11, 21, 0) == ELECTION_INVALID_VOTES);
+    ASSERT_TEST(electionAddVote(sample, 11, 21, -1) == ELECTION_INVALID_VOTES); // This should be ELECTION_AREA_NOT_EXIST because of error precedence.
+    ASSERT_TEST(electionAddVote(sample, 11, 21, 0) == ELECTION_INVALID_VOTES); // This should be ELECTION_AREA_NOT_EXIST because of error precedence.
 
     ASSERT_TEST(electionAddVote(sample, 21, 11, 8) == ELECTION_SUCCESS);
     return true;
@@ -497,8 +497,8 @@ bool subAddVotesErrorPrecedence(Election sample) {
     ASSERT_TEST(electionAddVote(sample, -1, 99, -1) == ELECTION_INVALID_ID);
     ASSERT_TEST(electionAddVote(sample, 99, -1, -1) == ELECTION_INVALID_ID);
 
-    ASSERT_TEST(electionAddVote(sample, 99, 99, -1) == ELECTION_INVALID_VOTES);
-    ASSERT_TEST(electionAddVote(sample, 99, 99, 3) == ELECTION_AREA_NOT_EXIST);
+    ASSERT_TEST(electionAddVote(sample, 99, 99, -1) == ELECTION_INVALID_VOTES); // This should be ELECTION_AREA_NOT_EXIST because of error precedence.
+    ASSERT_TEST(electionAddVote(sample, 99, 99, 3) == ELECTION_AREA_NOT_EXIST); 
     ASSERT_TEST(electionAddVote(sample, 21, 99, 3) == ELECTION_TRIBE_NOT_EXIST);
 
     return true;
@@ -526,7 +526,8 @@ bool subRemoveVotesInvalidId(Election sample) {
     ASSERT_TEST(electionRemoveVote(sample, 0, 11, 2) == ELECTION_SUCCESS);
     ASSERT_TEST(electionAddTribe(sample, 0, "zero tribe") == ELECTION_SUCCESS);
     ASSERT_TEST(electionRemoveVote(sample, 21, 0, 3) == ELECTION_SUCCESS);
-
+    
+    // Here 21 and 11 should switch places, otherwise both errors should be ELECTION_TRIBE_NOT_EXIST
     ASSERT_TEST(electionRemoveVote(sample, 11, 21, -1) ==
                 ELECTION_INVALID_VOTES);
     ASSERT_TEST(electionRemoveVote(sample, 11, 21, 0) ==
